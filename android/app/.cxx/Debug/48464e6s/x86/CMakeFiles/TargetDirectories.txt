@@ -1,0 +1,2 @@
+D:/Projects/memno/android/app/.cxx/Debug/48464e6s/x86/CMakeFiles/edit_cache.dir
+D:/Projects/memno/android/app/.cxx/Debug/48464e6s/x86/CMakeFiles/rebuild_cache.dir
