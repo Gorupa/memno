@@ -1,10 +1,13 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:memno/database/toggles_data.dart';
 
 class AppColors extends ChangeNotifier {
   late Box<TogglesData> _togglesBox;
-  bool _isDarkMode = false;
+  // Check if system is in dark mode
+  bool _isDarkMode =
+      PlatformDispatcher.instance.platformBrightness == Brightness.dark;
 
   AppColors() {
     init();
