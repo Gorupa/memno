@@ -1,7 +1,7 @@
 
 # 🧠 Memno — Save Links as Notes with Metadata Previews
 <p align="center">
-    <img src="assets/branding.png" height="320" />
+    <img src="assets/branding.png" width="640" />
    
 </p>
 
