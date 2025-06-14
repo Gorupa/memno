@@ -5,7 +5,7 @@
    
 </p>
 
-- Memno is a **Flutter-based mobile app** for saving important links along with personal notes. It auto-fetches rich metadata for each link, supports offline usage, and generates unique 6-digit codes for secure sharing.
+- Memno is a **Flutter-based mobile app** for saving important links along with personal notes. It auto-fetches rich metadata for each link, supports offline usage, and generates unique 6-digit codes for easy fetching.
 
 - Think of it as your personal link + note vault with instant previews.
 
