@@ -1,8 +1,8 @@
 
 # 🧠 Memno — Save Links as Notes with Metadata Previews
 <p align="center">
-    <img src="assets/memno_dark.png" width="200" />
-    <img src="assets/typo.png" width="250" style="border-radius: 12px;" />
+    <img src="assets/branding.png" width="640" />
+   
 </p>
 
 - Memno is a **Flutter-based mobile app** for saving important links along with personal notes. It auto-fetches rich metadata for each link, supports offline usage, and generates unique 6-digit codes for secure sharing.
@@ -37,21 +37,36 @@
 </p>
 
 ---
+## 🧠 Use Cases
+
+- 🔖 Save useful articles, videos, and tutorials with personal annotations
+
+- 🧰 Maintain a curated list of tools, links, or references for quick access
+
+- ✍️ Jot down thoughts or reminders tied to specific websites or content
+
+- 🔗 Save links with context for later reading (a smarter “read later” list)
+
+- 🧠 Use as a personal knowledge base that stays with you, even offline
+
+- 🕵️‍♂️ Archive interesting finds from Reddit, Twitter, or blogs with commentary
+
+- 🎓 Keep study materials or academic resources grouped with notes
+
+- 🧪 Save experimental ideas for future reference
+
+- 🛍 Create a wish list of products with custom notes before purchase
+
+- 🧑‍🍳 Save recipe links with modifications or ingredient replacements
+
+---
 ## 🔧 Installation
 
 - Just download the apk file from [here](https://github.com/jydv402/memno/releases/latest)
-- Install it and BOOM! that's it! 
+- Install it and BOOM! that's it, you're good to go! 
 
 ---
 
-## 🧠 Use Cases
-
-* Save useful articles with notes
-* Maintain a curated list of resources
-* Share annotated links via short codes
-* Personal knowledge base on your phone
-
----
 
 ## 📂 Project Structure
 
