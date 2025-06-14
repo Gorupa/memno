@@ -37,21 +37,36 @@
 </p>
 
 ---
+## 🧠 Use Cases
+
+- 🔖 Save useful articles, videos, and tutorials with personal annotations
+
+- 🧰 Maintain a curated list of tools, links, or references for quick access
+
+- ✍️ Jot down thoughts or reminders tied to specific websites or content
+
+- 🔗 Save links with context for later reading (a smarter “read later” list)
+
+- 🧠 Use as a personal knowledge base that stays with you, even offline
+
+- 🕵️‍♂️ Archive interesting finds from Reddit, Twitter, or blogs with commentary
+
+- 🎓 Keep study materials or academic resources grouped with notes
+
+- 🧪 Save experimental ideas for future reference
+
+- 🛍 Create a wish list of products with custom notes before purchase
+
+- 🧑‍🍳 Save recipe links with modifications or ingredient replacements
+
+---
 ## 🔧 Installation
 
 - Just download the apk file from [here](https://github.com/jydv402/memno/releases/latest)
-- Install it and BOOM! that's it! 
+- Install it and BOOM! that's it, you're good to go! 
 
 ---
 
-## 🧠 Use Cases
-
-* Save useful articles with notes
-* Maintain a curated list of resources
-* Share annotated links via short codes
-* Personal knowledge base on your phone
-
----
 
 ## 📂 Project Structure
 
