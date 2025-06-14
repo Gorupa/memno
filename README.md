@@ -1,8 +1,8 @@
 
 # 🧠 Memno — Save Links as Notes with Metadata Previews
 <p align="center">
-    <img src="assets/memno_dark.png" width="200" />
-    <img src="assets/typo.png" width="250" style="border-radius: 12px;" />
+    <img src="assets/branding.png" height="320" />
+   
 </p>
 
 - Memno is a **Flutter-based mobile app** for saving important links along with personal notes. It auto-fetches rich metadata for each link, supports offline usage, and generates unique 6-digit codes for secure sharing.
