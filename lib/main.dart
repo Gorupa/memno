@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memno/database/preview_data.dart';
 import 'package:memno/functionality/code_gen.dart';
 import 'package:memno/functionality/preview_map.dart';
 import 'package:memno/home.dart';
@@ -9,6 +10,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+
+  Hive.registerAdapter(PreviewDataModelAdapter());
+  await Hive.openBox<PreviewDataModel>('previewsBox');
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => CodeGen()),
