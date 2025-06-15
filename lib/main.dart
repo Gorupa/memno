@@ -31,15 +31,15 @@ class MyApp extends StatelessWidget {
           elevatedButtonTheme: ElevatedButtonThemeData(
               style: ButtonStyle(
                   overlayColor: WidgetStateProperty.all(
-                      colors.accnt.withOpacity(0.025)))),
+                      colors.accnt.withValues(alpha: 0.025)))),
           textSelectionTheme: TextSelectionThemeData(
             cursorColor: colors.fgClr,
-            selectionColor: colors.accnt.withOpacity(0.25),
+            selectionColor: colors.accnt.withValues(alpha: 0.25),
             selectionHandleColor: colors.fgClr,
           ),
           switchTheme: SwitchThemeData(
               trackColor:
-                  WidgetStateProperty.all(colors.accnt.withOpacity(0.3)),
+                  WidgetStateProperty.all(colors.accnt.withValues(alpha: 0.3)),
               overlayColor: WidgetStateProperty.all(colors.accnt))),
     );
   }

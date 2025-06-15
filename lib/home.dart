@@ -56,8 +56,6 @@ class _HomePageState extends State<HomePage> {
         filteredList = codeProvider.codeList
             .where((element) => codeProvider.getLinkListLength(element) == 0)
             .toList();
-      default:
-        filteredList = codeProvider.codeList;
     }
 
     if (_searchedCode.isNotEmpty) {
@@ -88,8 +86,6 @@ class _HomePageState extends State<HomePage> {
         return "No liked codes";
       case Filters.empty:
         return "No empty codes";
-      default:
-        return "Generate Code to view";
     }
   }
 
@@ -309,8 +305,8 @@ class CustomFAB extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFFffffff).withOpacity(0.1),
-              const Color(0xFFFFFFFF).withOpacity(0.05),
+              const Color(0xFFffffff).withValues(alpha: 0.1),
+              const Color(0xFFFFFFFF).withValues(alpha: 0.05),
             ],
             stops: const [
               0.1,
@@ -320,8 +316,8 @@ class CustomFAB extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFFffffff).withOpacity(0.5),
-            const Color((0xFFFFFFFF)).withOpacity(0.5),
+            const Color(0xFFffffff).withValues(alpha: 0.5),
+            const Color((0xFFFFFFFF)).withValues(alpha: 0.5),
           ],
         ),
         child: Row(
