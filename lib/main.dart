@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memno/database/preview_data.dart';
 import 'package:memno/functionality/code_gen.dart';
 import 'package:memno/functionality/preview_map.dart';
 import 'package:memno/home.dart';
@@ -8,7 +9,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Hive and register adapters
   await Hive.initFlutter();
+
+  Hive.registerAdapter(PreviewDataModelAdapter());
+  await Hive.openBox<PreviewDataModel>('previewsBox');
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => CodeGen()),
@@ -31,15 +36,15 @@ class MyApp extends StatelessWidget {
           elevatedButtonTheme: ElevatedButtonThemeData(
               style: ButtonStyle(
                   overlayColor: WidgetStateProperty.all(
-                      colors.accnt.withOpacity(0.025)))),
+                      colors.accnt.withValues(alpha: 0.025)))),
           textSelectionTheme: TextSelectionThemeData(
             cursorColor: colors.fgClr,
-            selectionColor: colors.accnt.withOpacity(0.25),
+            selectionColor: colors.accnt.withValues(alpha: 0.25),
             selectionHandleColor: colors.fgClr,
           ),
           switchTheme: SwitchThemeData(
               trackColor:
-                  WidgetStateProperty.all(colors.accnt.withOpacity(0.3)),
+                  WidgetStateProperty.all(colors.accnt.withValues(alpha: 0.3)),
               overlayColor: WidgetStateProperty.all(colors.accnt))),
     );
   }

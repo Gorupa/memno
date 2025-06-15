@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:linkfy_text/linkfy_text.dart';
 
+/// Main page widget for displaying and editing a list of links and a title.
 class InnerPage extends StatefulWidget {
   final int code;
   const InnerPage({super.key, required this.code});
@@ -27,8 +28,8 @@ class _InnerPageState extends State<InnerPage>
 
   Map<String, PreviewData> fetched = {};
 
-  int _isEditMode = 0;
-  int _editIndex = -1;
+  int _isEditMode = 0; // 0: add, 1: edit, 2: edit title, 3: delete
+  int _editIndex = -1; // Index of the item being edited/deleted
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +53,7 @@ class _InnerPageState extends State<InnerPage>
               final links = codeProvider.getLinksForCode(widget.code);
               String head = codeProvider.getHeadForCode(widget.code);
 
+              // If there are no links, show an empty state
               return links.isEmpty
                   ? ListView(
                       children: [
@@ -66,17 +68,18 @@ class _InnerPageState extends State<InnerPage>
                         ),
                       ],
                     )
+                  // Otherwise, show the list of links with previews
                   : ListView.builder(
                       padding: const EdgeInsets.only(bottom: 160),
                       itemCount: links.length + 1,
                       itemBuilder: (context, index) {
                         if (index == 0) {
+                          // Top bar with title
                           return innerPageTopBar(context, head);
                         } else {
-                          final previewData =
-                              previewMap.cache[links[index - 1]];
                           return Stack(
                             children: [
+                              // Main link preview container
                               Container(
                                 key: ValueKey(links[index - 1]),
                                 width: MediaQuery.of(context).size.width,
@@ -93,8 +96,9 @@ class _InnerPageState extends State<InnerPage>
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.only(top: 70),
-                                      //Strip the link at space
+                                      // Show link preview if valid, otherwise just text
                                       child: AnyLinkPreview.isValidLink(
+                                              //Check if the link is valid or not
                                               links[index - 1].split(' ').first)
                                           ? LinkPreview(
                                               requestTimeout:
@@ -152,13 +156,35 @@ class _InnerPageState extends State<InnerPage>
                                                 launchUrl(Uri.parse(
                                                     links[index - 1]));
                                               },
-                                              onPreviewDataFetched: (data) {
-                                                setState(() {
-                                                  previewMap.storePreview(
-                                                      links[index - 1], data);
-                                                });
+                                              onPreviewDataFetched:
+                                                  (data) async {
+                                                // setState(() {
+                                                //   previewMap.storePreview(
+                                                //       links[index - 1], data);
+                                                // });
+
+                                                // Save the preview data
+                                                await previewMap.savePreview(
+                                                    links[index - 1], data);
+
+                                                // final previewsBox =
+                                                //     await Hive.openBox<PreviewDataModel>(
+                                                //         'previewsBox');
+                                                // final previewDataModel = PreviewDataModel(
+                                                //   title: data.title,
+                                                //   description: data.description,
+                                                //   image: data.image?.url,
+                                                //   imageHeight: data.image?.height,
+                                                //   imageWidth: data.image?.width,
+                                                //   link: data.link,
+                                                // );
+                                                // await previewsBox.put(
+                                                //     links[index - 1],
+                                                //     previewDataModel);
                                               },
-                                              previewData: previewData,
+                                              previewData:
+                                                  previewMap.loadPreview(
+                                                      links[index - 1]),
                                               text: links[index - 1],
                                             )
                                           : Padding(
@@ -177,6 +203,7 @@ class _InnerPageState extends State<InnerPage>
                                             ),
                                     )),
                               ),
+                              // Button bar (copy, edit, delete)
                               Positioned(
                                 top: 10,
                                 right: 20,
@@ -187,7 +214,7 @@ class _InnerPageState extends State<InnerPage>
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        //Copy Button in Button Bar
+                                        // Copy Button
                                         InnerPageButton(
                                           onPressed: () {
                                             showToastMsg(
@@ -200,7 +227,7 @@ class _InnerPageState extends State<InnerPage>
                                           icon: Icons.copy_rounded,
                                         ),
                                         const Spacer(),
-                                        //Edit Button in Button Bar
+                                        // Edit Button
                                         InnerPageButton(
                                           icon: Icons.mode_edit_outline_rounded,
                                           onPressed: () {
@@ -215,7 +242,7 @@ class _InnerPageState extends State<InnerPage>
                                           },
                                         ),
                                         const Spacer(),
-                                        //Delete Button in Button Bar
+                                        // Delete Button
                                         InnerPageButton(
                                           icon: Icons.delete_rounded,
                                           onPressed: () {
@@ -232,6 +259,7 @@ class _InnerPageState extends State<InnerPage>
                                       ]),
                                 ),
                               ),
+                              // Index badge
                               Positioned(
                                   top: 22,
                                   left: 22,
@@ -260,20 +288,25 @@ class _InnerPageState extends State<InnerPage>
                       });
             },
           ),
+          // Floating action button for adding/editing/deleting entries
           floatingActionButton: CustomInnerFAB(
             onConfirm: () {
               if (_linkController.text.isNotEmpty) {
                 if (_isEditMode == 1) {
+                  // Edit existing link
                   codeProvider.editLink(
                       widget.code, _editIndex, _linkController.text);
                   showToastMsg(context, "Entry edited!");
                 } else if (_isEditMode == 2) {
+                  // Edit title
                   codeProvider.addHead(widget.code, _linkController.text);
                   showToastMsg(context, "New title added!");
                 } else if (_isEditMode == 3) {
+                  // Delete link
                   codeProvider.deleteLink(widget.code, _editIndex);
                   showToastMsg(context, "Entry deleted!");
                 } else {
+                  // Add new link
                   codeProvider.addLink(widget.code, _linkController.text);
                   showToastMsg(context, "New entry added!");
                 }
@@ -307,6 +340,7 @@ class _InnerPageState extends State<InnerPage>
     );
   }
 
+  /// Top bar widget showing the title and edit button
   Widget innerPageTopBar(BuildContext context, String head) {
     final colors = Provider.of<AppColors>(context);
     return Container(
@@ -320,6 +354,7 @@ class _InnerPageState extends State<InnerPage>
       ),
       child: Stack(
         children: [
+          // Title text (truncated if too long)
           Positioned(
             top: 42,
             left: 26,
@@ -329,6 +364,7 @@ class _InnerPageState extends State<InnerPage>
                     fontWeight: FontWeight.w700,
                     fontSize: 48)),
           ),
+          // Edit title button
           Positioned(
               bottom: 10,
               right: 10,
@@ -350,11 +386,11 @@ class _InnerPageState extends State<InnerPage>
   @override
   void dispose() {
     _linkController.dispose();
-
     super.dispose();
   }
 }
 
+/// Custom floating action bar for adding/editing/deleting links or title.
 class CustomInnerFAB extends StatelessWidget {
   const CustomInnerFAB({
     super.key,
@@ -386,6 +422,7 @@ class CustomInnerFAB extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Text field for link or title input
           Expanded(
             flex: 5,
             child: Container(
@@ -414,6 +451,7 @@ class CustomInnerFAB extends StatelessWidget {
               ),
             ),
           ),
+          // Confirm and cancel buttons
           Expanded(
             flex: 1,
             child: Column(
