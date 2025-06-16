@@ -48,6 +48,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/apk/release/app-release.apk"
-          tag: v${{ steps.version.outputs.version_name }}+${{ steps.version.outputs.version_code }}
+          tag: ${{ steps.version.outputs.version_name }}+${{ steps.version.outputs.version_code }}
           name: Memno v${{ steps.version.outputs.version_name }}
           token: ${{ secrets.MEMNO_TOKEN }}

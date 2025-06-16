@@ -1,10 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:memno/functionality/check_update.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
+
+  void _showDialog(
+      BuildContext context, String title, String content, AppColors colors) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: colors.box,
+        title: Text(title,
+            style: TextStyle(
+                fontFamily: 'Product', fontSize: 20, color: colors.textClr)),
+        content: Text(content,
+            style: TextStyle(
+                fontFamily: 'Product', fontSize: 18, color: colors.textClr)),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              "OK",
+              style: TextStyle(
+                  fontFamily: 'Product', fontSize: 16, color: colors.textClr),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +67,67 @@ class SettingsPage extends StatelessWidget {
               settingsTitle("About", colors),
               settingsContainer(
                   ListTile(
+                      onTap: () async {
+                        final info = await PackageInfo.fromPlatform();
+                        final currVer = info.version;
+                        if (currVer.isEmpty) {
+                          _showDialog(
+                              context.mounted ? context : context,
+                              "Version Check Failed",
+                              "Could not retrieve current version.",
+                              colors);
+                          return;
+                        }
+                        // Get latest release data from GitHub
+                        final release = await getLatestGitHubRelease();
+                        if (release == null) {
+                          _showDialog(
+                              context.mounted ? context : context,
+                              "Update Check Failed",
+                              "Could not check for updates.",
+                              colors);
+                          return;
+                        }
+
+                        final latestVer = release['tag_name']
+                            as String; // Obtain latest version on GitHub
+                        final browserUrl = release['assets'][0]
+                                ['browser_download_url']
+                            as String; // Obtain download link for the latest version
+                        if (browserUrl.isEmpty || latestVer.isEmpty) {
+                          _showDialog(
+                              context.mounted ? context : context,
+                              "Update Check Failed",
+                              "Could not find download link for the latest version.",
+                              colors);
+                          return;
+                        }
+                        if (isNewerVersion(latestVer, currVer)) {
+                          _showDialog(
+                              context.mounted ? context : context,
+                              "Update Available",
+                              "A new version ($latestVer) is available. Please update to enjoy the latest features.",
+                              colors);
+                        } else {
+                          _showDialog(
+                              context.mounted ? context : context,
+                              "No Updates",
+                              "You are using the latest version ($currVer).",
+                              colors);
+                        }
+                      },
+                      trailing: Icon(Icons.file_download_outlined,
+                          color: colors.textClr),
+                      title: Text(
+                        "Check for updates",
+                        style: TextStyle(
+                            fontFamily: 'Product',
+                            fontSize: 18,
+                            color: colors.textClr),
+                      )),
+                  colors),
+              settingsContainer(
+                  ListTile(
                       onTap: () {
                         launchUrl(
                             Uri.parse("https://github.com/jydv402/memno"));
@@ -51,18 +142,6 @@ class SettingsPage extends StatelessWidget {
                             color: colors.textClr),
                       )),
                   colors),
-              settingsContainer(
-                  ListTile(
-                      trailing:
-                          Icon(Icons.download_rounded, color: colors.textClr),
-                      title: Text(
-                        "Check for updates",
-                        style: TextStyle(
-                            fontFamily: 'Product',
-                            fontSize: 18,
-                            color: colors.textClr),
-                      )),
-                  colors)
             ],
           )),
     );
