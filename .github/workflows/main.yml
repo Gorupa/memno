@@ -2,9 +2,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 name: Build Memno App
 
@@ -26,11 +23,23 @@ jobs:
         with:
           channel: stable
 
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
+
       - name: Flutter clean
         run: flutter clean
 
       - name: Getting Dependencies
         run: flutter pub upgrade
+
+      - name: Extract version from pubspec.yaml
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          VERSION_NAME=$(echo $VERSION | cut -d'+' -f1)
+          VERSION_CODE=$(echo $VERSION | cut -d'+' -f2)
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
 
       - name: Building APK
         run: flutter build apk --release
@@ -39,5 +48,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/apk/release/app-release.apk"
-          tag: v1.0.${{ github.run_number }}
+          tag: v${{ steps.version.outputs.version_name }}+${{ steps.version.outputs.version_code }}
+          name: Memno v${{ steps.version.outputs.version_name }}
           token: ${{ secrets.MEMNO_TOKEN }}
