@@ -8,8 +8,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
-  void _showDialog(
-      BuildContext context, String title, String content, AppColors colors) {
+  void _showDialog(BuildContext context, String title, String content,
+      AppColors colors, VoidCallback onPressed) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -22,9 +22,7 @@ class SettingsPage extends StatelessWidget {
                 fontFamily: 'Product', fontSize: 18, color: colors.textClr)),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+            onPressed: onPressed,
             child: Text(
               "OK",
               style: TextStyle(
@@ -64,18 +62,24 @@ class SettingsPage extends StatelessWidget {
                 ),
                 colors,
               ),
-              settingsTitle("About", colors),
+              settingsTitle("Updates", colors),
               settingsContainer(
                   ListTile(
                       onTap: () async {
                         final info = await PackageInfo.fromPlatform();
-                        final currVer = info.version;
-                        if (currVer.isEmpty) {
+                        final currVer = info.version; // Get current app version
+                        final buildNumber =
+                            info.buildNumber; // Get build number
+                        if (currVer.isEmpty || buildNumber.isEmpty) {
                           _showDialog(
-                              context.mounted ? context : context,
-                              "Version Check Failed",
-                              "Could not retrieve current version.",
-                              colors);
+                            context.mounted ? context : context,
+                            "Version Check Failed",
+                            "Could not retrieve current version.",
+                            colors,
+                            () {
+                              Navigator.pop(context);
+                            },
+                          );
                           return;
                         }
                         // Get latest release data from GitHub
@@ -85,7 +89,9 @@ class SettingsPage extends StatelessWidget {
                               context.mounted ? context : context,
                               "Update Check Failed",
                               "Could not check for updates.",
-                              colors);
+                              colors, () {
+                            Navigator.pop(context);
+                          });
                           return;
                         }
 
@@ -99,21 +105,33 @@ class SettingsPage extends StatelessWidget {
                               context.mounted ? context : context,
                               "Update Check Failed",
                               "Could not find download link for the latest version.",
-                              colors);
+                              colors, () {
+                            Navigator.pop(context);
+                          });
                           return;
                         }
-                        if (isNewerVersion(latestVer, currVer)) {
+                        // Compare versions
+                        if (isNewerVersion(latestVer, currVer, buildNumber)) {
                           _showDialog(
-                              context.mounted ? context : context,
-                              "Update Available",
-                              "A new version ($latestVer) is available. Please update to enjoy the latest features.",
-                              colors);
+                            context.mounted ? context : context,
+                            "Update Available",
+                            "A new version ($latestVer) is available. Please update to enjoy the latest features.",
+                            colors,
+                            () {
+                              Navigator.pop(context);
+                              launchUrl(Uri.parse(browserUrl));
+                            },
+                          );
                         } else {
                           _showDialog(
-                              context.mounted ? context : context,
-                              "No Updates",
-                              "You are using the latest version ($currVer).",
-                              colors);
+                            context.mounted ? context : context,
+                            "No Updates",
+                            "You are using the latest version ($currVer).",
+                            colors,
+                            () {
+                              Navigator.pop(context);
+                            },
+                          );
                         }
                       },
                       trailing: Icon(Icons.file_download_outlined,
@@ -126,6 +144,7 @@ class SettingsPage extends StatelessWidget {
                             color: colors.textClr),
                       )),
                   colors),
+              settingsTitle("About", colors),
               settingsContainer(
                   ListTile(
                       onTap: () {

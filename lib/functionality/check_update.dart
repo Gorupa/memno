@@ -13,8 +13,23 @@ Future<Map<String, dynamic>?> getLatestGitHubRelease() async {
   }
 }
 
-bool isNewerVersion(String latest, String current) {
-  print("Comparing versions: Latest: $latest, Current: $current");
-  final latestParts = latest.split('.').map(int.parse).toList();
+bool isNewerVersion(String latest, String current, String buildNumber) {
+  //print("Comparing versions: Latest: $latest, Current: $current");
+  // eg latest = "1.2.3+11", current = "1.2.2"
+  // Remove after '+' if present in latest version
+  final latestParts = latest.split('+')[0].split('.').map(int.parse).toList() +
+      (latest.contains('+') ? [int.parse(latest.split('+')[1])] : []);
+  final currentParts =
+      current.split('.').map(int.parse).toList() + [int.parse(buildNumber)];
+
+  //print("Latest parts: $latestParts, Current parts: $currentParts");
+
+  for (int i = 0; i < latestParts.length; i++) {
+    if (i >= currentParts.length || latestParts[i] > currentParts[i]) {
+      return true;
+    } else if (latestParts[i] < currentParts[i]) {
+      return false;
+    }
+  }
   return false;
 }
