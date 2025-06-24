@@ -19,10 +19,14 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
+            def storeFilePath = keystoreProperties['storeFile']
+            // Check if the storeFilePath is not null or empty and proceed only if it is valid
+            if (storeFilePath != null && storeFilePath != '') {
+                storeFile file(storeFilePath)
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
         }
     }
 

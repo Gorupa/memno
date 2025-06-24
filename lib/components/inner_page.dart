@@ -110,6 +110,7 @@ class _InnerPageState extends State<InnerPage>
                                               enableAnimation: true,
                                               openOnPreviewImageTap: true,
                                               openOnPreviewTitleTap: true,
+                                              // Use the first part of the link as the URL
                                               header: links[index - 1]
                                                           .split(' ')
                                                           .length >
@@ -158,29 +159,8 @@ class _InnerPageState extends State<InnerPage>
                                               },
                                               onPreviewDataFetched:
                                                   (data) async {
-                                                // setState(() {
-                                                //   previewMap.storePreview(
-                                                //       links[index - 1], data);
-                                                // });
-
-                                                // Save the preview data
                                                 await previewMap.savePreview(
                                                     links[index - 1], data);
-
-                                                // final previewsBox =
-                                                //     await Hive.openBox<PreviewDataModel>(
-                                                //         'previewsBox');
-                                                // final previewDataModel = PreviewDataModel(
-                                                //   title: data.title,
-                                                //   description: data.description,
-                                                //   image: data.image?.url,
-                                                //   imageHeight: data.image?.height,
-                                                //   imageWidth: data.image?.width,
-                                                //   link: data.link,
-                                                // );
-                                                // await previewsBox.put(
-                                                //     links[index - 1],
-                                                //     previewDataModel);
                                               },
                                               previewData:
                                                   previewMap.loadPreview(
