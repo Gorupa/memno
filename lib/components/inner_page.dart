@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' show PreviewData;
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
+import 'package:linkfy_text/linkfy_text.dart';
 import 'package:memno/components/inner_page_fun.dart';
 import 'package:memno/components/show_toast.dart';
 import 'package:memno/functionality/code_gen.dart';
@@ -10,7 +11,6 @@ import 'package:memno/functionality/preview_map.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:linkfy_text/linkfy_text.dart';
 
 /// Main page widget for displaying and editing a list of links and a title.
 class InnerPage extends StatefulWidget {
