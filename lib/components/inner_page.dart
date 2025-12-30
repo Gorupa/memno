@@ -163,7 +163,7 @@ class _InnerPageState extends State<InnerPage>
                                                     links[index - 1], data);
                                               },
                                               previewData:
-                                                  previewMap.loadPreview(
+                                                  previewMap.loadPreviewSync(
                                                       links[index - 1]),
                                               text: links[index - 1],
                                             )
