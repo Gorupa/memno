@@ -148,6 +148,7 @@ class CodeGen extends ChangeNotifier {
   // reloads the code box
   Future<void> reloadCodeBox() async {
     _codeBox = await Hive.openBox<CodeData>('codeData');
+    _isReady = true;
     notifyListeners();
   }
 }

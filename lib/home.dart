@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glassmorphism/glassmorphism.dart';
 import 'package:memno/components/custom_overlay.dart';
 import 'package:memno/components/inner_page.dart';
 import 'package:memno/components/settings_page.dart';
@@ -7,7 +8,6 @@ import 'package:memno/components/sub_tile.dart';
 import 'package:memno/functionality/code_gen.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
-import 'package:glassmorphism/glassmorphism.dart';
 
 enum Filters { all, liked, empty }
 
@@ -71,6 +71,12 @@ class _HomePageState extends State<HomePage> {
       showToastMsg(context,
           "${filteredList.length} results found for \"$_searchedCode\"");
     }
+    // Sort based on the date
+    filteredList.sort((a, b) {
+      final aDate = DateTime.parse(codeProvider.getDateForCode(a));
+      final bDate = DateTime.parse(codeProvider.getDateForCode(b));
+      return bDate.compareTo(aDate);
+    });
 
     return filteredList;
   }
@@ -151,8 +157,8 @@ class _HomePageState extends State<HomePage> {
                         customToggle: _customToggleButtons(context),
                       );
                     } else {
-                      final reversedIndex = filteredList.length - index;
-                      final code = filteredList[reversedIndex];
+                      //final reversedIndex = filteredList.length - index;
+                      final code = filteredList[index - 1];
                       final date = codeProvider.getDateForCode(code);
                       final isLiked = codeProvider.getLikeForCode(code);
                       return subTile(context, code, date, isLiked);
