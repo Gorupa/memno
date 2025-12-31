@@ -105,7 +105,13 @@ class ImportExport {
         allowedExtensions: ['json'],
         withData: true,
       );
-      if (result == null) return;
+      // Show cancelled message if the import is cancelled halfway
+      if (result == null) {
+        if (context.mounted) {
+          showToastMsg(context, 'Import Cancelled');
+        }
+        return;
+      }
 
       // Decode JSON
       final bytes = result.files.first.bytes;
