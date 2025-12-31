@@ -1,7 +1,8 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:memno/database/code_data.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:memno/database/code_data.dart';
 
 class CodeGen extends ChangeNotifier {
   late Box<CodeData> _codeBox;
@@ -142,5 +143,11 @@ class CodeGen extends ChangeNotifier {
       codeData.save();
       notifyListeners();
     }
+  }
+
+  // reloads the code box
+  Future<void> reloadCodeBox() async {
+    _codeBox = await Hive.openBox<CodeData>('codeData');
+    notifyListeners();
   }
 }

@@ -82,6 +82,9 @@ class SettingsPage extends StatelessWidget {
                   colors),
               settingsContainer(
                   ListTile(
+                    onTap: () {
+                      ImportExport().importFromJSON(context);
+                    },
                     title: Text(
                       "Import from JSON",
                       style: TextStyle(

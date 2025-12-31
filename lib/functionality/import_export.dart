@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:memno/components/show_toast.dart';
 import 'package:memno/database/code_data.dart';
+import 'package:memno/functionality/code_gen.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 
 class ImportExport {
 // TODO: Add import and export functionality using JSON file
@@ -58,9 +60,12 @@ class ImportExport {
       // Then convert the int list to Uint8List as SAF (Storage Access Framework) demands it
       final bytes = Uint8List.fromList(utf8.encode(json));
 
+      // Clear the temporary files
+      await FilePicker.platform.clearTemporaryFiles();
+
       // Get the save destination
       // Write the file
-      await FilePicker.platform.saveFile(
+      final result = await FilePicker.platform.saveFile(
         dialogTitle: 'Export Memno Notes',
         fileName: 'memno_notes.json',
         type: FileType.custom,
@@ -68,9 +73,13 @@ class ImportExport {
         bytes: bytes,
       );
 
-      // final bytes = utf8.encode(json);
-      // final file = File(userPath);
-      // await file.writeAsBytes(bytes, flush: true);
+      // Show cancelled message if the export is cancelled halfway
+      if (result == null) {
+        if (context.mounted) {
+          showToastMsg(context, 'Export Cancelled');
+        }
+        return;
+      }
 
       // Show success message
       if (context.mounted) {
@@ -78,6 +87,51 @@ class ImportExport {
       }
     } catch (e) {
       debugPrint('ExportToJSON error: $e');
+      if (context.mounted) {
+        showToastMsg(context, e.toString());
+      }
+    }
+  }
+
+  // Import from JSON function
+  Future<void> importFromJSON(BuildContext context) async {
+    try {
+      await _loadCodeBox();
+      if (_codeBox == null) return;
+
+      // Get the file
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        withData: true,
+      );
+      if (result == null) return;
+
+      // Decode JSON
+      final bytes = result.files.first.bytes;
+      final jsonString = utf8.decode(bytes!);
+      final json = jsonDecode(jsonString) as Map<String, dynamic>;
+
+      // Get the notes
+      final notes = json['notes'] as List;
+
+      // Add the notes to the box
+      for (final note in notes) {
+        final codeData = CodeData.fromJSON(note);
+        await _codeBox!.put(codeData.code, codeData);
+      }
+
+      // Reload the code box
+      if (context.mounted) {
+        context.read<CodeGen>().reloadCodeBox();
+      }
+
+      // Show success message
+      if (context.mounted) {
+        showToastMsg(context, 'Successfully Imported from JSON');
+      }
+    } catch (e) {
+      debugPrint('ImportFromJSON error: $e');
       if (context.mounted) {
         showToastMsg(context, e.toString());
       }
