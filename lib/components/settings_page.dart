@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:memno/functionality/check_update.dart';
+import 'package:memno/functionality/import_export.dart';
 import 'package:memno/theme/app_colors.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -62,6 +63,39 @@ class SettingsPage extends StatelessWidget {
                 ),
                 colors,
               ),
+              settingsTitle("Data", colors),
+              settingsContainer(
+                  ListTile(
+                    onTap: () {
+                      ImportExport().exportToJSON(context);
+                    },
+                    title: Text(
+                      "Export to JSON",
+                      style: TextStyle(
+                          fontFamily: 'Product',
+                          fontSize: 18,
+                          color: colors.textClr),
+                    ),
+                    trailing:
+                        Icon(Icons.arrow_upward_rounded, color: colors.textClr),
+                  ),
+                  colors),
+              settingsContainer(
+                  ListTile(
+                    onTap: () {
+                      ImportExport().importFromJSON(context);
+                    },
+                    title: Text(
+                      "Import from JSON",
+                      style: TextStyle(
+                          fontFamily: 'Product',
+                          fontSize: 18,
+                          color: colors.textClr),
+                    ),
+                    trailing: Icon(Icons.arrow_downward_rounded,
+                        color: colors.textClr),
+                  ),
+                  colors),
               settingsTitle("Updates", colors),
               settingsContainer(
                   ListTile(
