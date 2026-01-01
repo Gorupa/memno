@@ -37,19 +37,17 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const HomePage(),
       theme: ThemeData(
-          elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ButtonStyle(
-                  overlayColor: WidgetStateProperty.all(
-                      colors.accnt.withValues(alpha: 0.025)))),
-          textSelectionTheme: TextSelectionThemeData(
-            cursorColor: colors.fgClr,
-            selectionColor: colors.accnt.withValues(alpha: 0.25),
-            selectionHandleColor: colors.fgClr,
-          ),
-          switchTheme: SwitchThemeData(
-              trackColor:
-                  WidgetStateProperty.all(colors.accnt.withValues(alpha: 0.3)),
-              overlayColor: WidgetStateProperty.all(colors.accnt))),
+        colorScheme: ColorScheme.fromSeed(seedColor: colors.accnt),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+                overlayColor: WidgetStateProperty.all(
+                    colors.accnt.withValues(alpha: 0.025)))),
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: colors.fgClr,
+          selectionColor: colors.accnt.withValues(alpha: 0.25),
+          selectionHandleColor: colors.fgClr,
+        ),
+      ),
     );
   }
 }

@@ -51,6 +51,10 @@ class SettingsPage extends StatelessWidget {
               settingsTitle("Settings", colors),
               settingsContainer(
                 SwitchListTile(
+                  trackColor: WidgetStateProperty.all(
+                      colors.accnt.withValues(alpha: 0.3)),
+                  overlayColor: WidgetStateProperty.all(colors.accnt),
+                  thumbColor: WidgetStateProperty.all(colors.thumbClr),
                   title: Text("Dark Mode",
                       style: TextStyle(
                           fontFamily: 'Product',
@@ -59,6 +63,26 @@ class SettingsPage extends StatelessWidget {
                   value: context.watch<AppColors>().isDarkMode,
                   onChanged: (_) async {
                     await colors.toggleTheme();
+                  },
+                ),
+                colors,
+              ),
+              settingsContainer(
+                SwitchListTile(
+                  trackColor: WidgetStateProperty.all(
+                      colors.accnt.withValues(alpha: 0.3)),
+                  overlayColor: WidgetStateProperty.all(colors.accnt),
+                  thumbColor: WidgetStateProperty.all(colors.thumbClr),
+                  trackOutlineColor:
+                      WidgetStateProperty.all(colors.switchTrackOutlineClr),
+                  title: Text("Compact Header",
+                      style: TextStyle(
+                          fontFamily: 'Product',
+                          fontSize: 18,
+                          color: colors.textClr)),
+                  value: context.watch<AppColors>().isCompactHeader,
+                  onChanged: (_) async {
+                    await colors.toggleCompactHeader();
                   },
                 ),
                 colors,
@@ -195,6 +219,8 @@ class SettingsPage extends StatelessWidget {
                             color: colors.textClr),
                       )),
                   colors),
+              // Bottom padding
+              const SizedBox(height: 100),
             ],
           )),
     );

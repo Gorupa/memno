@@ -406,7 +406,7 @@ class TopAccentBox extends StatelessWidget {
         children: [
           //Main accent container
           Container(
-            height: 280,
+            height: colors.isCompactHeader ? 95 : 280,
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(50.0)),
               color: colors.accnt,
@@ -419,22 +419,24 @@ class TopAccentBox extends StatelessWidget {
             child: customToggle,
           ),
           //Intro text
-          const Positioned(
-              top: 38,
-              left: 26,
-              child: Text("Hi,\nI'm Memno",
-                  style: TextStyle(
-                      fontFamily: 'Product',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 48))),
+          if (!colors.isCompactHeader)
+            Positioned(
+                top: 38,
+                left: 26,
+                child: Text("Hi,\nI'm Memno",
+                    style: TextStyle(
+                        fontFamily: 'Product',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 48))),
           //Memno image
-          Positioned(
-            top: 54,
-            right: 24,
-            height: 110,
-            width: 110,
-            child: Image.asset('assets/memno_clear_blk.png'),
-          ),
+          if (!colors.isCompactHeader)
+            Positioned(
+              top: 54,
+              right: 24,
+              height: 110,
+              width: 110,
+              child: Image.asset('assets/memno_clear_blk.png'),
+            ),
           //Code count
           Positioned(
             bottom: 16,
