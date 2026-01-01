@@ -339,27 +339,30 @@ class CustomFAB extends StatelessWidget {
               ),
               onPressed: () {
                 context.read<CodeGen>().generateCode();
-                Navigator.of(context).push(PageRouteBuilder(
-                  transitionDuration: const Duration(milliseconds: 500),
-                  pageBuilder: (context, animation, secondaryAnimation) {
-                    return CustomOverlay(
-                      child: InnerPage(
-                          code: context.read<CodeGen>().codeList.last),
-                    );
-                  },
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    return ScaleTransition(
-                      scale: Tween<double>(begin: 0.0, end: 1.0).animate(
-                        CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.fastLinearToSlowEaseIn,
+
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    pageBuilder: (context, animation, secondaryAnimation) {
+                      return CustomOverlay(
+                        child: InnerPage(
+                            code: context.read<CodeGen>().codeList.last),
+                      );
+                    },
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      return ScaleTransition(
+                        scale: Tween<double>(begin: 0.0, end: 1.0).animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.fastLinearToSlowEaseIn,
+                          ),
                         ),
-                      ),
-                      child: child,
-                    );
-                  },
-                ));
+                        child: child,
+                      );
+                    },
+                  ),
+                );
               },
               child: const Icon(
                 Icons.add_rounded,

@@ -17,14 +17,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.4.1"
-  animate_to:
-    dependency: "direct main"
-    description:
-      name: animate_to
-      sha256: bdcde4039fe2a718f2c84866aaa48d9f8aaa2ced5bb8211de8be87f1e20cb986
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.0"
   ansicolor:
     dependency: transitive
     description:
