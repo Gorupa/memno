@@ -154,7 +154,8 @@ class SettingsPage extends StatelessWidget {
                         }
 
                         final latestVer = release['tag_name']
-                            as String; // Obtain latest version on GitHub
+                            .toString()
+                            .split('+')[0]; // Obtain latest version on GitHub
                         final browserUrl = release['assets'][0]
                                 ['browser_download_url']
                             as String; // Obtain download link for the latest version
