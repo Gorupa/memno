@@ -43,7 +43,7 @@ class AppColors extends ChangeNotifier {
   Future<void> toggleCompactHeader() async {
     _isCompactHeader = !_isCompactHeader;
     TogglesData togglesData = TogglesData(compactHeader: _isCompactHeader);
-    await _togglesBox.put(1, togglesData);
+    await _togglesBox.put(0, togglesData);
     notifyListeners();
   }
 
