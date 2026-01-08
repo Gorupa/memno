@@ -20,8 +20,16 @@ class AppColors extends ChangeNotifier {
     _togglesBox = await Hive.openBox<TogglesData>('togglesData');
 
     TogglesData? togglesData = _togglesBox.get(0);
-    _isDarkMode = togglesData?.darkMode ?? false;
-    _isCompactHeader = togglesData?.compactHeader ?? false;
+
+    if (togglesData == null) {
+      await _togglesBox.put(
+        0,
+        TogglesData(darkMode: _isDarkMode, compactHeader: _isCompactHeader),
+      );
+    } else {
+      _isDarkMode = togglesData.darkMode;
+      _isCompactHeader = togglesData.compactHeader;
+    }
     notifyListeners();
   }
 
@@ -34,7 +42,8 @@ class AppColors extends ChangeNotifier {
   // Toggle dark mode and save it to the togglesData box
   Future<void> toggleTheme() async {
     _isDarkMode = !_isDarkMode;
-    TogglesData togglesData = TogglesData(darkMode: _isDarkMode);
+    TogglesData togglesData =
+        TogglesData(darkMode: _isDarkMode, compactHeader: _isCompactHeader);
     await _togglesBox.put(0, togglesData);
     notifyListeners();
   }
@@ -42,7 +51,8 @@ class AppColors extends ChangeNotifier {
   // Toggle compact header and save it to the togglesData box
   Future<void> toggleCompactHeader() async {
     _isCompactHeader = !_isCompactHeader;
-    TogglesData togglesData = TogglesData(compactHeader: _isCompactHeader);
+    TogglesData togglesData =
+        TogglesData(darkMode: _isDarkMode, compactHeader: _isCompactHeader);
     await _togglesBox.put(0, togglesData);
     notifyListeners();
   }
