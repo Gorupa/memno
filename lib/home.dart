@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:memno/components/custom_overlay.dart';
@@ -23,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchedCode = '';
   bool isSearchBarVisible = false;
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -59,17 +62,13 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (_searchedCode.isNotEmpty) {
-      filteredList = filteredList.where(
-        (code) {
-          final codeString = code.toString();
-          final headString = codeProvider.getHeadForCode(code).toLowerCase();
-          final searchCodeLwr = _searchedCode.toLowerCase();
-          return codeString.contains(searchCodeLwr) ||
-              headString.contains(searchCodeLwr);
-        },
-      ).toList();
-      showToastMsg(context,
-          "${filteredList.length} results found for \"$_searchedCode\"");
+      filteredList = filteredList.where((code) {
+        final codeString = code.toString();
+        final headString = codeProvider.getHeadForCode(code).toLowerCase();
+        final searchCodeLwr = _searchedCode.toLowerCase();
+        return codeString.contains(searchCodeLwr) ||
+            headString.contains(searchCodeLwr);
+      }).toList();
     }
     // Sort based on the date
     filteredList.sort((a, b) {
@@ -79,6 +78,34 @@ class _HomePageState extends State<HomePage> {
     });
 
     return filteredList;
+  }
+
+  /// Search function
+  ///
+  /// Uses a debounce timer to prevent too many UI rebuilds
+  /// Current debounce time is 300ms
+  void _onSearch(String searchQuery) {
+    if (_debounceTimer?.isActive ?? false) {
+      _debounceTimer?.cancel();
+    }
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      setState(() {
+        _searchedCode = searchQuery;
+      });
+
+      if (searchQuery.isNotEmpty) {
+        // Temporary filter run
+        // Computed just to get the count for toast
+        // Heavy, might remove later
+        final codeProvider = context.read<CodeGen>();
+        final results = listFilter(codeProvider);
+
+        showToastMsg(
+          context,
+          "${results.length} results found for \"$searchQuery\"",
+        );
+      }
+    });
   }
 
   String _emptyMsg() {
@@ -108,9 +135,7 @@ class _HomePageState extends State<HomePage> {
         leading: IconButton(
           onPressed: () => Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const SettingsPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const SettingsPage()),
           ),
           icon: const Icon(Icons.menu_rounded),
         ),
@@ -163,7 +188,8 @@ class _HomePageState extends State<HomePage> {
                       final isLiked = codeProvider.getLikeForCode(code);
                       return subTile(context, code, date, isLiked);
                     }
-                  });
+                  },
+                );
         },
       ),
       floatingActionButton: isSearchBarVisible
@@ -196,20 +222,29 @@ class _HomePageState extends State<HomePage> {
       isSelected: Filters.values.map((e) => e == _filter).toList(),
       children: [
         Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: widthOfToggle, vertical: 19),
-            child: const Text('   All   ',
-                style: TextStyle(fontFamily: 'Product'))),
+          padding: EdgeInsets.symmetric(
+            horizontal: widthOfToggle,
+            vertical: 19,
+          ),
+          child: const Text(
+            '   All   ',
+            style: TextStyle(fontFamily: 'Product'),
+          ),
+        ),
         Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: widthOfToggle, vertical: 19),
-            child:
-                const Text('Liked', style: TextStyle(fontFamily: 'Product'))),
+          padding: EdgeInsets.symmetric(
+            horizontal: widthOfToggle,
+            vertical: 19,
+          ),
+          child: const Text('Liked', style: TextStyle(fontFamily: 'Product')),
+        ),
         Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: widthOfToggle, vertical: 19),
-            child:
-                const Text('Empty', style: TextStyle(fontFamily: 'Product'))),
+          padding: EdgeInsets.symmetric(
+            horizontal: widthOfToggle,
+            vertical: 19,
+          ),
+          child: const Text('Empty', style: TextStyle(fontFamily: 'Product')),
+        ),
       ],
     );
   }
@@ -241,23 +276,16 @@ class _HomePageState extends State<HomePage> {
                     _searchController.clear();
                   });
                 },
-                onChanged: (value) {
-                  setState(() {
-                    _searchedCode = value;
-                  });
-                },
+                onChanged: _onSearch,
                 maxLines: 1,
-                style: TextStyle(
-                  color: colors.fgClr,
-                  fontFamily: 'Product',
-                ),
+                style: TextStyle(color: colors.fgClr, fontFamily: 'Product'),
                 decoration: InputDecoration(
-                  icon: const Icon(
-                    Icons.search_rounded,
-                  ),
+                  icon: const Icon(Icons.search_rounded),
                   iconColor: colors.search,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   border: InputBorder.none,
                   focusedBorder: InputBorder.none,
                   enabledBorder: InputBorder.none,
@@ -269,16 +297,17 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(width: 4),
           ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colors.search,
-                shape: const CircleBorder(),
-                padding: const EdgeInsets.all(25),
-              ),
-              onPressed: () {
-                switchSearchMode();
-                clearState();
-              },
-              child: Icon(Icons.close_rounded, color: colors.box))
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.search,
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(25),
+            ),
+            onPressed: () {
+              switchSearchMode();
+              clearState();
+            },
+            child: Icon(Icons.close_rounded, color: colors.box),
+          ),
         ],
       ),
     );
@@ -286,10 +315,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class CustomFAB extends StatelessWidget {
-  const CustomFAB({
-    super.key,
-    required this.onSearch,
-  });
+  const CustomFAB({super.key, required this.onSearch});
 
   final double radius = 50.0;
   final double height = 100.0;
@@ -308,16 +334,14 @@ class CustomFAB extends StatelessWidget {
         borderRadius: radius + 10,
         border: 2,
         linearGradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFFffffff).withValues(alpha: 0.1),
-              const Color(0xFFFFFFFF).withValues(alpha: 0.05),
-            ],
-            stops: const [
-              0.1,
-              1,
-            ]),
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFffffff).withValues(alpha: 0.1),
+            const Color(0xFFFFFFFF).withValues(alpha: 0.05),
+          ],
+          stops: const [0.1, 1],
+        ),
         borderGradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -339,43 +363,44 @@ class CustomFAB extends StatelessWidget {
               ),
               onPressed: () {
                 context.read<CodeGen>().generateCode();
-                Navigator.of(context).push(PageRouteBuilder(
-                  transitionDuration: const Duration(milliseconds: 500),
-                  pageBuilder: (context, animation, secondaryAnimation) {
-                    return CustomOverlay(
-                      child: InnerPage(
-                          code: context.read<CodeGen>().codeList.last),
-                    );
-                  },
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    return ScaleTransition(
-                      scale: Tween<double>(begin: 0.0, end: 1.0).animate(
-                        CurvedAnimation(
-                          parent: animation,
-                          curve: Curves.fastLinearToSlowEaseIn,
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    pageBuilder: (context, animation, secondaryAnimation) {
+                      return CustomOverlay(
+                        child: InnerPage(
+                          code: context.read<CodeGen>().codeList.last,
                         ),
-                      ),
-                      child: child,
-                    );
-                  },
-                ));
+                      );
+                    },
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                          return ScaleTransition(
+                            scale: Tween<double>(begin: 0.0, end: 1.0).animate(
+                              CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.fastLinearToSlowEaseIn,
+                              ),
+                            ),
+                            child: child,
+                          );
+                        },
+                  ),
+                );
               },
-              child: const Icon(
-                Icons.add_rounded,
-                size: 30,
-              ),
+              child: const Icon(Icons.add_rounded, size: 30),
             ),
             const Spacer(),
             ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  shape: const CircleBorder(),
-                  fixedSize: Size(height - 20, height - 20),
-                ),
-                onPressed: onSearch,
-                child: const Icon(Icons.search_rounded, size: 30)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+                shape: const CircleBorder(),
+                fixedSize: Size(height - 20, height - 20),
+              ),
+              onPressed: onSearch,
+              child: const Icon(Icons.search_rounded, size: 30),
+            ),
             const Spacer(),
           ],
         ),
@@ -413,20 +438,20 @@ class TopAccentBox extends StatelessWidget {
             ),
           ),
           //Custom toggle button
-          Positioned(
-            bottom: 16,
-            left: 16,
-            child: customToggle,
-          ),
+          Positioned(bottom: 16, left: 16, child: customToggle),
           //Intro text
           const Positioned(
-              top: 38,
-              left: 26,
-              child: Text("Hi,\nI'm Memno",
-                  style: TextStyle(
-                      fontFamily: 'Product',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 48))),
+            top: 38,
+            left: 26,
+            child: Text(
+              "Hi,\nI'm Memno",
+              style: TextStyle(
+                fontFamily: 'Product',
+                fontWeight: FontWeight.w700,
+                fontSize: 48,
+              ),
+            ),
+          ),
           //Memno image
           Positioned(
             top: 54,

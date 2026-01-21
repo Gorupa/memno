@@ -12,10 +12,11 @@ void showToastMsg(BuildContext context, String msg) {
     snackbarDuration: const Duration(seconds: 2),
     position: DelightSnackbarPosition.top,
     builder: (context) => ToastCard(
-        color: colors.toastBg,
-        title: Text(
-          msg,
-          style: TextStyle(fontFamily: 'Product', color: colors.toastText),
-        )),
+      color: colors.toastBg,
+      title: Text(
+        msg,
+        style: TextStyle(fontFamily: 'Product', color: colors.toastText),
+      ),
+    ),
   ).show(context);
 }
