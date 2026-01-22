@@ -21,8 +21,35 @@ rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
+// subprojects {
+//     project.evaluationDependsOn(":app")
+    
+// }
+
 subprojects {
-    project.evaluationDependsOn(":app")
+    // Only apply this to plugins / libraries, not the main app
+    if (project.name != "app") {
+        
+        // Force Kotlin to target Java 17
+        project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+
+        // Force Android Java Compilation to Version 17
+        project.afterEvaluate {
+            if (project.hasProperty("android")) {
+                project.android {
+                    compileOptions {
+                        sourceCompatibility JavaVersion.VERSION_17
+                        targetCompatibility JavaVersion.VERSION_17
+                    }
+                }
+            }
+        }
+    }
 }
 
 tasks.register("clean", Delete) {

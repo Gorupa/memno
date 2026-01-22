@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:memno/database/toggles_data.dart';
@@ -77,7 +78,7 @@ class DarkColors {
   final Color accntText = Colors.white;
   final Color textClr = Colors.white;
   final Color iconClr = Colors.white;
-  final Color btnClr = Colors.grey[800]!.withOpacity(0.5);
+  final Color btnClr = Colors.grey[800]!.withValues(alpha: 0.5);
   final Color btnIcon = Colors.white;
   final Color pill = Colors.grey[800]!;
   final Color toastBg = Colors.grey[100]!;
