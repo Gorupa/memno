@@ -51,16 +51,20 @@ class CodeGen extends ChangeNotifier {
 
   //return the lenght of link list
   int getLinkListLength(int code) {
-    final codeData =
-        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    final codeData = _codeBox.values.firstWhere(
+      (codeData) => codeData.code == code,
+      orElse: () => CodeData(code, [], "", false, ""),
+    );
     //orElse: () => CodeData(code, [], date, liked, head));
     return codeData.links.length;
   }
 
   //returns date
   String getDateForCode(int code) {
-    final codeData =
-        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    final codeData = _codeBox.values.firstWhere(
+      (codeData) => codeData.code == code,
+      orElse: () => CodeData(code, [], "", false, ""),
+    );
     //orElse: () => CodeData(code, [], date, liked, head));
 
     return codeData.date;
@@ -68,8 +72,10 @@ class CodeGen extends ChangeNotifier {
 
   //returns liked status
   bool getLikeForCode(int code) {
-    final codeData =
-        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    final codeData = _codeBox.values.firstWhere(
+      (codeData) => codeData.code == code,
+      orElse: () => CodeData(code, [], "", false, ""),
+    );
     //orElse: () => CodeData(code, [], date, liked, head));
     return codeData.liked;
   }
@@ -86,8 +92,10 @@ class CodeGen extends ChangeNotifier {
 
   //returns list of links
   List<String> getLinksForCode(int code) {
-    final codeData =
-        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    final codeData = _codeBox.values.firstWhere(
+      (codeData) => codeData.code == code,
+      orElse: () => CodeData(code, [], "", false, ""),
+    );
     //orElse: () => CodeData(code, [], date, liked, head));
 
     return codeData.links;
@@ -105,8 +113,10 @@ class CodeGen extends ChangeNotifier {
 
   //returns heading text
   String getHeadForCode(int code) {
-    final codeData =
-        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    final codeData = _codeBox.values.firstWhere(
+      (codeData) => codeData.code == code,
+      orElse: () => CodeData(code, [], "", false, "Untitled"),
+    );
     //orElse: () => CodeData(code, [], date, liked, head));
     return codeData.head;
   }

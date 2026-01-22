@@ -7,5 +7,8 @@ class TogglesData extends HiveObject {
   @HiveField(0)
   bool darkMode;
 
-  TogglesData({this.darkMode = false});
+  @HiveField(1)
+  bool compactHeader;
+
+  TogglesData({this.darkMode = false, this.compactHeader = false});
 }

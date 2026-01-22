@@ -18,15 +18,18 @@ class TogglesDataAdapter extends TypeAdapter<TogglesData> {
     };
     return TogglesData(
       darkMode: fields[0] as bool,
+      compactHeader: fields[1] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, TogglesData obj) {
     writer
-      ..writeByte(1)
+      ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.darkMode);
+      ..write(obj.darkMode)
+      ..writeByte(1)
+      ..write(obj.compactHeader);
   }
 
   @override

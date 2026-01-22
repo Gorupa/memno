@@ -9,6 +9,7 @@ class AppColors extends ChangeNotifier {
   // Check if system is in dark mode
   bool _isDarkMode =
       PlatformDispatcher.instance.platformBrightness == Brightness.dark;
+  bool _isCompactHeader = false;
 
   AppColors() {
     init();
@@ -19,18 +20,39 @@ class AppColors extends ChangeNotifier {
     _togglesBox = await Hive.openBox<TogglesData>('togglesData');
 
     TogglesData? togglesData = _togglesBox.get(0);
-    _isDarkMode = togglesData?.darkMode ?? false;
+
+    if (togglesData == null) {
+      await _togglesBox.put(
+        0,
+        TogglesData(darkMode: _isDarkMode, compactHeader: _isCompactHeader),
+      );
+    } else {
+      _isDarkMode = togglesData.darkMode;
+      _isCompactHeader = togglesData.compactHeader;
+    }
     notifyListeners();
   }
 
   bool get isDarkMode => _isDarkMode;
+  bool get isCompactHeader => _isCompactHeader;
 
   final _light = LightColors();
   final _dark = DarkColors();
 
+  // Toggle dark mode and save it to the togglesData box
   Future<void> toggleTheme() async {
     _isDarkMode = !_isDarkMode;
-    TogglesData togglesData = TogglesData(darkMode: _isDarkMode);
+    TogglesData togglesData =
+        TogglesData(darkMode: _isDarkMode, compactHeader: _isCompactHeader);
+    await _togglesBox.put(0, togglesData);
+    notifyListeners();
+  }
+
+  // Toggle compact header and save it to the togglesData box
+  Future<void> toggleCompactHeader() async {
+    _isCompactHeader = !_isCompactHeader;
+    TogglesData togglesData =
+        TogglesData(darkMode: _isDarkMode, compactHeader: _isCompactHeader);
     await _togglesBox.put(0, togglesData);
     notifyListeners();
   }
@@ -49,6 +71,9 @@ class AppColors extends ChangeNotifier {
   Color get pill => _isDarkMode ? _dark.pill : _light.pill;
   Color get toastBg => _isDarkMode ? _dark.toastBg : _light.toastBg;
   Color get toastText => _isDarkMode ? _dark.toastText : _light.toastText;
+  Color get thumbClr => _isDarkMode ? _dark.thumbClr : _light.thumbClr;
+  Color get switchTrackOutlineClr =>
+      _isDarkMode ? _dark.switchTrackOutlineClr : _light.switchTrackOutlineClr;
 }
 
 class LightColors {
@@ -66,6 +91,8 @@ class LightColors {
   final Color pill = Colors.grey[300]!;
   final Color toastBg = Colors.grey[900]!;
   final Color toastText = Colors.white;
+  final Color thumbClr = Colors.black54;
+  final Color switchTrackOutlineClr = Colors.black54;
 }
 
 class DarkColors {
@@ -83,4 +110,6 @@ class DarkColors {
   final Color pill = Colors.grey[800]!;
   final Color toastBg = Colors.grey[100]!;
   final Color toastText = Colors.black;
+  final Color thumbClr = Colors.white;
+  final Color switchTrackOutlineClr = Colors.transparent;
 }
