@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_types/flutter_chat_types.dart';
+import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:hive/hive.dart';
 import 'package:memno/database/preview_data.dart';
 
 class PreviewMap extends ChangeNotifier {
   // final Box _previewBox = Hive.box('previewsBox');
-  final Map<String, PreviewData> cache = {};
+  final Map<String, LinkPreviewData> cache = {};
 
   Box<PreviewDataModel>? _previewBox;
 
@@ -34,7 +34,7 @@ class PreviewMap extends ChangeNotifier {
   }
 
   // Save a preview
-  Future<void> savePreview(String link, PreviewData data) async {
+  Future<void> savePreview(String link, LinkPreviewData data) async {
     try {
       if (!_isInit) await _init();
       if (_previewBox == null) return;
@@ -54,17 +54,17 @@ class PreviewMap extends ChangeNotifier {
   }
 
   // Load a preview
-  PreviewData? loadPreviewSync(String link) {
+  LinkPreviewData? loadPreviewSync(String link) {
     try {
       if (_previewBox != null && _previewBox!.isOpen) {
         final model = _previewBox!.get(link);
         if (model == null) return null;
-        final preview = PreviewData(
+        final preview = LinkPreviewData(
           title: model.title,
           description: model.description,
-          link: model.link,
+          link: model.link!,
           image: model.image != null
-              ? PreviewDataImage(
+              ? ImagePreviewData(
                   url: model.image!,
                   height: model.imageHeight ?? 0,
                   width: model.imageWidth ?? 0,
@@ -83,18 +83,18 @@ class PreviewMap extends ChangeNotifier {
   }
 
   // Load all previews into cache (e.g., on startup)
-  Future<PreviewData?> loadPreview(String link) async {
+  Future<LinkPreviewData?> loadPreview(String link) async {
     try {
       if (!_isInit) await _init();
       if (_previewBox == null) return null;
       final model = _previewBox!.get(link);
       if (model == null) return null;
-      final preview = PreviewData(
+      final preview = LinkPreviewData(
         title: model.title,
         description: model.description,
-        link: model.link,
+        link: model.link!,
         image: model.image != null
-            ? PreviewDataImage(
+            ? ImagePreviewData(
                 url: model.image!,
                 height: model.imageHeight ?? 0,
                 width: model.imageWidth ?? 0,

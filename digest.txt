@@ -1,0 +1,2879 @@
+Directory structure:
+└── memno/
+    ├── pubspec.yaml
+    └── lib/
+        ├── home.dart
+        ├── main.dart
+        ├── components/
+        │   ├── custom_overlay.dart
+        │   ├── inner_page.dart
+        │   ├── inner_page_fun.dart
+        │   ├── settings_page.dart
+        │   ├── show_toast.dart
+        │   └── sub_tile.dart
+        ├── database/
+        │   ├── code_data.dart
+        │   ├── code_data.g.dart
+        │   ├── preview_data.dart
+        │   ├── preview_data.g.dart
+        │   ├── toggles_data.dart
+        │   └── toggles_data.g.dart
+        ├── functionality/
+        │   ├── check_update.dart
+        │   ├── code_gen.dart
+        │   ├── import_export.dart
+        │   └── preview_map.dart
+        └── theme/
+            └── app_colors.dart
+
+================================================
+FILE: pubspec.yaml
+================================================
+name: memno
+description: "An app to memorise links and notes."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.1.1+1
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.6
+  provider: ^6.1.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_link_previewer: ^4.2.0
+  url_launcher: ^6.3.0
+  flutter_chat_types: ^3.6.2
+  glassmorphism: ^3.0.0
+  any_link_preview: ^3.0.2
+  flutter_native_splash: ^2.4.1
+  lottie: ^3.1.2
+  delightful_toast: ^1.1.0
+  linkfy_text: ^1.1.6
+  package_info_plus: ^9.0.0
+  http: ^1.4.0
+  file_picker: ^10.3.8
+  flutter_chat_core: ^2.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.12
+  hive_generator: ^2.0.1
+  flutter_launcher_icons: ^0.14.3
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: Product
+      fonts:
+        - asset: fonts/ProductSans-Thin.ttf
+          weight: 100
+        - asset: fonts/ProductSans-Light.ttf
+          weight: 300
+        - asset: fonts/ProductSans-Regular.ttf
+          weight: 500
+        - asset: fonts/ProductSans-Medium.ttf
+          weight: 600
+        - asset: fonts/ProductSans-Bold.ttf
+          weight: 700
+        - asset: fonts/ProductSans-Black.ttf
+          weight: 800
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_native_splash:
+  android: true
+  ios: true
+  web: false
+
+  color: "#dafc08"
+  image: "assets/memno_clear_blk.png"
+
+  android_12:
+    color: "#ffffff"
+    image: "assets/memno_light.png"
+
+    color_dark: "#000000"
+    image_dark: "assets/memno_dark.png"
+
+
+
+================================================
+FILE: lib/home.dart
+================================================
+import 'package:flutter/material.dart';
+import 'package:glassmorphism/glassmorphism.dart';
+import 'package:memno/components/custom_overlay.dart';
+import 'package:memno/components/inner_page.dart';
+import 'package:memno/components/settings_page.dart';
+import 'package:memno/components/show_toast.dart';
+import 'package:memno/components/sub_tile.dart';
+import 'package:memno/functionality/code_gen.dart';
+import 'package:memno/theme/app_colors.dart';
+import 'package:provider/provider.dart';
+
+enum Filters { all, liked, empty }
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Filters _filter = Filters.all;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchedCode = '';
+  bool isSearchBarVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    clearState();
+  }
+
+  void switchSearchMode() {
+    setState(() {
+      isSearchBarVisible = !isSearchBarVisible;
+    });
+  }
+
+  void clearState() {
+    setState(() {
+      _searchController.clear();
+      _searchedCode = '';
+    });
+  }
+
+  List<int> listFilter(CodeGen codeProvider) {
+    List<int> filteredList;
+    switch (_filter) {
+      case Filters.all:
+        filteredList = codeProvider.codeList;
+      case Filters.liked:
+        filteredList = codeProvider.codeList
+            .where((element) => codeProvider.getLikeForCode(element))
+            .toList();
+      case Filters.empty:
+        filteredList = codeProvider.codeList
+            .where((element) => codeProvider.getLinkListLength(element) == 0)
+            .toList();
+    }
+
+    if (_searchedCode.isNotEmpty) {
+      filteredList = filteredList.where((code) {
+        final codeString = code.toString();
+        final headString = codeProvider.getHeadForCode(code).toLowerCase();
+        final searchCodeLwr = _searchedCode.toLowerCase();
+        return codeString.contains(searchCodeLwr) ||
+            headString.contains(searchCodeLwr);
+      }).toList();
+      showToastMsg(
+        context,
+        "${filteredList.length} results found for \"$_searchedCode\"",
+      );
+    }
+    // Sort based on the date
+    filteredList.sort((a, b) {
+      final aDate = DateTime.parse(codeProvider.getDateForCode(a));
+      final bDate = DateTime.parse(codeProvider.getDateForCode(b));
+      return bDate.compareTo(aDate);
+    });
+
+    return filteredList;
+  }
+
+  String _emptyMsg() {
+    if (_searchedCode.isNotEmpty) {
+      return "No results found for \"$_searchedCode\"";
+    }
+    switch (_filter) {
+      case Filters.all:
+        return "Generate Code to view";
+      case Filters.liked:
+        return "No liked codes";
+      case Filters.empty:
+        return "No empty codes";
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+
+    return Scaffold(
+      backgroundColor: colors.bgClr,
+      appBar: AppBar(
+        backgroundColor: colors.bgClr,
+        foregroundColor: colors.fgClr,
+        surfaceTintColor: colors.bgClr,
+        leading: IconButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SettingsPage()),
+          ),
+          icon: const Icon(Icons.menu_rounded),
+        ),
+      ),
+      body: Consumer<CodeGen>(
+        builder: (context, codeProvider, child) {
+          if (!codeProvider.isReady) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final filteredList = listFilter(codeProvider);
+
+          return filteredList.isEmpty
+              ? ListView(
+                  children: [
+                    TopAccentBox(
+                      colors: colors,
+                      length: filteredList.length,
+                      filter: _filter,
+                      customToggle: _customToggleButtons(context),
+                    ),
+                    const SizedBox(height: 50),
+                    Center(
+                      child: Text(
+                        _emptyMsg(),
+                        style: TextStyle(
+                          color: colors.textClr,
+                          fontFamily: 'Product',
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.35),
+                  ],
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 130),
+                  itemCount: filteredList.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return TopAccentBox(
+                        colors: colors,
+                        length: filteredList.length,
+                        filter: _filter,
+                        customToggle: _customToggleButtons(context),
+                      );
+                    } else {
+                      //final reversedIndex = filteredList.length - index;
+                      final code = filteredList[index - 1];
+                      final date = codeProvider.getDateForCode(code);
+                      final isLiked = codeProvider.getLikeForCode(code);
+                      return subTile(context, code, date, isLiked);
+                    }
+                  },
+                );
+        },
+      ),
+      floatingActionButton: isSearchBarVisible
+          ? subTileSearch(context)
+          : CustomFAB(
+              onSearch: () {
+                switchSearchMode();
+                clearState();
+              },
+            ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  Widget _customToggleButtons(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    final widthOfToggle = MediaQuery.of(context).size.width * 0.05;
+    return ToggleButtons(
+      borderColor: Colors.black,
+      selectedBorderColor: Colors.black,
+      selectedColor: colors.accntText,
+      fillColor: colors.accntPill,
+      direction: Axis.horizontal,
+      onPressed: (int index) {
+        setState(() {
+          _filter = Filters.values[index];
+        });
+      },
+      borderRadius: BorderRadius.circular(50),
+      isSelected: Filters.values.map((e) => e == _filter).toList(),
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: widthOfToggle,
+            vertical: 19,
+          ),
+          child: const Text(
+            '   All   ',
+            style: TextStyle(fontFamily: 'Product'),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: widthOfToggle,
+            vertical: 19,
+          ),
+          child: const Text('Liked', style: TextStyle(fontFamily: 'Product')),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: widthOfToggle,
+            vertical: 19,
+          ),
+          child: const Text('Empty', style: TextStyle(fontFamily: 'Product')),
+        ),
+      ],
+    );
+  }
+
+  Widget subTileSearch(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(2, 4, 2, 4),
+              padding: const EdgeInsets.fromLTRB(26, 0, 4, 0),
+              height: 75,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color: colors.box,
+                border: Border.all(color: colors.search),
+              ),
+              child: TextField(
+                controller: _searchController,
+                autofocus: true,
+                onTap: () {
+                  setState(() {
+                    _searchedCode = '';
+                    _searchController.clear();
+                  });
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _searchedCode = value;
+                  });
+                },
+                maxLines: 1,
+                style: TextStyle(color: colors.fgClr, fontFamily: 'Product'),
+                decoration: InputDecoration(
+                  icon: const Icon(Icons.search_rounded),
+                  iconColor: colors.search,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.search,
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(25),
+            ),
+            onPressed: () {
+              switchSearchMode();
+              clearState();
+            },
+            child: Icon(Icons.close_rounded, color: colors.box),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CustomFAB extends StatelessWidget {
+  const CustomFAB({super.key, required this.onSearch});
+
+  final double radius = 50.0;
+  final double height = 100.0;
+  final double width = 200.0;
+  final VoidCallback onSearch;
+
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+      tag: 'fab_to_page',
+      child: GlassmorphicContainer(
+        width: width,
+        height: height,
+        alignment: Alignment.center,
+        blur: 20,
+        borderRadius: radius + 10,
+        border: 2,
+        linearGradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFffffff).withValues(alpha: 0.1),
+            const Color(0xFFFFFFFF).withValues(alpha: 0.05),
+          ],
+          stops: const [0.1, 1],
+        ),
+        borderGradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFffffff).withValues(alpha: 0.5),
+            const Color((0xFFFFFFFF)).withValues(alpha: 0.5),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+                shape: const CircleBorder(),
+                fixedSize: Size(height - 20, height - 20),
+              ),
+              onPressed: () {
+                context.read<CodeGen>().generateCode();
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    pageBuilder: (context, animation, secondaryAnimation) {
+                      return CustomOverlay(
+                        child: InnerPage(
+                          code: context.read<CodeGen>().codeList.last,
+                        ),
+                      );
+                    },
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                          return ScaleTransition(
+                            scale: Tween<double>(begin: 0.0, end: 1.0).animate(
+                              CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.fastLinearToSlowEaseIn,
+                              ),
+                            ),
+                            child: child,
+                          );
+                        },
+                  ),
+                );
+              },
+              child: const Icon(Icons.add_rounded, size: 30),
+            ),
+            const Spacer(),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+                shape: const CircleBorder(),
+                fixedSize: Size(height - 20, height - 20),
+              ),
+              onPressed: onSearch,
+              child: const Icon(Icons.search_rounded, size: 30),
+            ),
+            const Spacer(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class TopAccentBox extends StatelessWidget {
+  const TopAccentBox({
+    super.key,
+    required this.colors,
+    required this.length,
+    required this.filter,
+    required this.customToggle,
+  });
+
+  final AppColors colors;
+  final int length;
+  final Filters filter;
+  final Widget customToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(2, 0, 2, 4),
+      child: Stack(
+        children: [
+          //Main accent container
+          Container(
+            height: 280,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(50.0)),
+              color: colors.accnt,
+            ),
+          ),
+          //Custom toggle button
+          Positioned(bottom: 16, left: 16, child: customToggle),
+          //Intro text
+          const Positioned(
+            top: 38,
+            left: 26,
+            child: Text(
+              "Hi,\nI'm Memno",
+              style: TextStyle(
+                fontFamily: 'Product',
+                fontWeight: FontWeight.w700,
+                fontSize: 48,
+              ),
+            ),
+          ),
+          //Memno image
+          Positioned(
+            top: 54,
+            right: 24,
+            height: 110,
+            width: 110,
+            child: Image.asset('assets/memno_clear_blk.png'),
+          ),
+          //Code count
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: Container(
+              width: 130,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                color: colors.accntPill,
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Text(
+                length == 1 ? '$length Code' : '$length Codes',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Product',
+                  color: colors.accntText,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+================================================
+FILE: lib/main.dart
+================================================
+import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:memno/database/preview_data.dart';
+import 'package:memno/functionality/code_gen.dart';
+import 'package:memno/functionality/preview_map.dart';
+import 'package:memno/home.dart';
+import 'package:memno/theme/app_colors.dart';
+import 'package:provider/provider.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Hive and register adapters
+  try {
+    await Hive.initFlutter();
+
+    Hive.registerAdapter(PreviewDataModelAdapter());
+    await Hive.openBox<PreviewDataModel>('previewsBox');
+  } catch (e, st) {
+    debugPrint('Error: $e\nStacktrace: $st');
+  }
+
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (context) => CodeGen()),
+    ChangeNotifierProvider(create: (context) => PreviewMap()),
+    ChangeNotifierProvider(create: (context) => AppColors()),
+  ], child: const MyApp()));
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return MaterialApp(
+      title: 'Memno',
+      debugShowCheckedModeBanner: false,
+      home: const HomePage(),
+      theme: ThemeData(
+          elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ButtonStyle(
+                  overlayColor: WidgetStateProperty.all(
+                      colors.accnt.withValues(alpha: 0.025)))),
+          textSelectionTheme: TextSelectionThemeData(
+            cursorColor: colors.fgClr,
+            selectionColor: colors.accnt.withValues(alpha: 0.25),
+            selectionHandleColor: colors.fgClr,
+          ),
+          switchTheme: SwitchThemeData(
+              trackColor:
+                  WidgetStateProperty.all(colors.accnt.withValues(alpha: 0.3)),
+              overlayColor: WidgetStateProperty.all(colors.accnt))),
+    );
+  }
+}
+
+
+
+================================================
+FILE: lib/components/custom_overlay.dart
+================================================
+import 'package:flutter/material.dart';
+
+class CustomOverlay extends StatelessWidget {
+  final Widget child;
+
+  const CustomOverlay({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      type: MaterialType.transparency,
+      child: Stack(
+        children: [
+          child,
+          Positioned.fill(
+            child: IgnorePointer(
+              ignoring: true,
+              child: Container(color: Colors.transparent),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+================================================
+FILE: lib/components/inner_page.dart
+================================================
+import 'package:any_link_preview/any_link_preview.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' show PreviewData;
+import 'package:flutter_link_previewer/flutter_link_previewer.dart';
+import 'package:linkfy_text/linkfy_text.dart';
+import 'package:memno/components/inner_page_fun.dart';
+import 'package:memno/components/show_toast.dart';
+import 'package:memno/functionality/code_gen.dart';
+import 'package:memno/functionality/preview_map.dart';
+import 'package:memno/theme/app_colors.dart';
+import 'package:provider/provider.dart';
+
+/// Main page widget for displaying and editing a list of links and a title.
+class InnerPage extends StatefulWidget {
+  final int code;
+  const InnerPage({super.key, required this.code});
+
+  @override
+  State<InnerPage> createState() => _InnerPageState();
+}
+
+class _InnerPageState extends State<InnerPage>
+    with SingleTickerProviderStateMixin {
+  final TextEditingController _linkController = TextEditingController();
+  final FocusNode _fabFocus = FocusNode();
+
+  Map<String, PreviewData> fetched = {};
+
+  int _isEditMode = 0; // 0: add, 1: edit, 2: edit title, 3: delete
+  int _editIndex = -1; // Index of the item being edited/deleted
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    final codeProvider = Provider.of<CodeGen>(context);
+
+    return Hero(
+      tag: 'fab_to_page',
+      transitionOnUserGestures: true,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Scaffold(
+          backgroundColor: colors.bgClr,
+          appBar: AppBar(
+            backgroundColor: colors.bgClr,
+            foregroundColor: colors.fgClr,
+            surfaceTintColor: colors.bgClr,
+          ),
+          body: Consumer2<CodeGen, PreviewMap>(
+            builder: (context, codeProvider, previewMap, child) {
+              final links = codeProvider.getLinksForCode(widget.code);
+              String head = codeProvider.getHeadForCode(widget.code);
+
+              // If there are no links, show an empty state
+              return links.isEmpty
+                  ? ListView(
+                      children: [
+                        innerPageTopBar(context, head),
+                        const SizedBox(height: 50),
+                        Center(
+                          child: Text(
+                            "It's so empty here...",
+                            style: TextStyle(
+                              color: colors.textClr,
+                              fontFamily: 'Product',
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  // Otherwise, show the list of links with previews
+                  : ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 160),
+                      itemCount: links.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          // Top bar with title
+                          return innerPageTopBar(context, head);
+                        } else {
+                          return Stack(
+                            children: [
+                              // Main link preview container
+                              Container(
+                                key: ValueKey(links[index - 1]),
+                                width: MediaQuery.of(context).size.width,
+                                margin: const EdgeInsets.fromLTRB(2, 4, 2, 4),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(50),
+                                  ),
+                                  color: colors.box,
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(50),
+                                  ),
+                                  child:
+                                      AnyLinkPreview.isValidLink(
+                                        //Check if the link is valid or not
+                                        links[index - 1].split(' ').first,
+                                      )
+                                      ? Column(
+                                          crossAxisAlignment: .start,
+                                          children: [
+                                            // Show the link text
+                                            Padding(
+                                              padding: .fromLTRB(22, 90, 22, 0),
+                                              child: LinkifyText(
+                                                links[index - 1],
+                                                linkStyle: TextStyle(
+                                                  color: Colors.blue[300],
+                                                  fontFamily: 'Product',
+                                                  fontSize: 16,
+                                                ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+
+                                            // Show the link preview
+                                            LinkPreview(
+                                              requestTimeout: const Duration(
+                                                seconds: 10,
+                                              ),
+                                              minWidth:
+                                                  MediaQuery.of(
+                                                    context,
+                                                  ).size.width +
+                                                  50,
+                                              gap: 20,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              sideBorderColor:
+                                                  Colors.transparent,
+                                              imageBuilder: (image) {
+                                                return Container(
+                                                  decoration: BoxDecoration(
+                                                    // Check if the image is a square or a rectangle
+                                                    // if square -> curve is 10
+                                                    // if rectangle -> curve is 30
+                                                    borderRadius:
+                                                        previewMap
+                                                                .loadPreviewSync(
+                                                                  links[index -
+                                                                      1],
+                                                                )
+                                                                ?.image
+                                                                ?.height ==
+                                                            previewMap
+                                                                .loadPreviewSync(
+                                                                  links[index -
+                                                                      1],
+                                                                )
+                                                                ?.image
+                                                                ?.width
+                                                        ? BorderRadius.circular(
+                                                            10,
+                                                            // Square image
+                                                          )
+                                                        : BorderRadius.circular(
+                                                            30,
+                                                            // Rectangle image
+                                                          ),
+                                                    image: DecorationImage(
+                                                      image: NetworkImage(
+                                                        image,
+                                                      ), // Obtain the image
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              outsidePadding: const .fromLTRB(
+                                                10,
+                                                10,
+                                                10,
+                                                18,
+                                              ),
+                                              enableAnimation: true,
+
+                                              // Style of the head text
+                                              titleTextStyle: TextStyle(
+                                                color: colors.textClr,
+                                                fontWeight: .bold,
+                                                fontSize: 32,
+                                                fontFamily: 'Product',
+                                              ),
+
+                                              // Style of the description text
+                                              descriptionTextStyle: TextStyle(
+                                                color: colors.textClr,
+                                                fontFamily: 'Product',
+                                                fontSize: 14,
+                                              ),
+
+                                              // Save the preview data locally when it is fetched
+                                              onLinkPreviewDataFetched:
+                                                  (data) async {
+                                                    await previewMap
+                                                        .savePreview(
+                                                          links[index - 1],
+                                                          data,
+                                                        );
+                                                  },
+
+                                              // Load from the previously saved data
+                                              linkPreviewData: previewMap
+                                                  .loadPreviewSync(
+                                                    links[index - 1],
+                                                  ),
+
+                                              // The link to be fetched
+                                              text: links[index - 1],
+                                            ),
+                                          ],
+                                        )
+                                      :
+                                        // If the link is not a valid URL, it is a normal note. Add it as is
+                                        Padding(
+                                          padding: const .fromLTRB(
+                                            36,
+                                            100,
+                                            26,
+                                            26,
+                                          ),
+                                          child: Text(
+                                            links[index - 1],
+                                            style: TextStyle(
+                                              color: colors.textClr,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'Product',
+                                              fontSize: 24,
+                                            ),
+                                          ),
+                                        ),
+                                ),
+                              ),
+                              // Button bar (copy, edit, delete)
+                              Positioned(
+                                top: 10,
+                                right: 20,
+                                child: SizedBox(
+                                  width: 200,
+                                  height: 80,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      // Copy Button
+                                      InnerPageButton(
+                                        onPressed: () {
+                                          showToastMsg(context, "Item copied!");
+                                          Clipboard.setData(
+                                            ClipboardData(
+                                              text: links[index - 1],
+                                            ),
+                                          );
+                                        },
+                                        icon: Icons.copy_rounded,
+                                      ),
+                                      const Spacer(),
+                                      // Edit Button
+                                      InnerPageButton(
+                                        icon: Icons.mode_edit_outline_rounded,
+                                        onPressed: () {
+                                          setState(() {
+                                            _isEditMode = 1;
+                                            _editIndex = index - 1;
+                                            _linkController.text =
+                                                links[index - 1];
+                                          });
+                                          FocusScope.of(
+                                            context,
+                                          ).requestFocus(_fabFocus);
+                                        },
+                                      ),
+                                      const Spacer(),
+                                      // Delete Button
+                                      InnerPageButton(
+                                        icon: Icons.delete_rounded,
+                                        onPressed: () {
+                                          setState(() {
+                                            _isEditMode = 3;
+                                            _editIndex = index - 1;
+                                            _linkController.text =
+                                                "Do you want to delete entry no.$index ? This is irreversible.";
+                                          });
+                                          FocusScope.of(
+                                            context,
+                                          ).requestFocus(_fabFocus);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              // Index badge
+                              Positioned(
+                                top: 22,
+                                left: 22,
+                                child: Container(
+                                  height: 58,
+                                  width: 78,
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(50),
+                                    ),
+                                    color: Colors.black,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      index.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.white,
+                                        fontFamily: 'Product',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                      },
+                    );
+            },
+          ),
+          // Floating action button for adding/editing/deleting entries
+          floatingActionButton: CustomInnerFAB(
+            onConfirm: () {
+              if (_linkController.text.isNotEmpty) {
+                if (_isEditMode == 1) {
+                  // Edit existing link
+                  codeProvider.editLink(
+                    widget.code,
+                    _editIndex,
+                    _linkController.text,
+                  );
+                  showToastMsg(context, "Entry edited!");
+                } else if (_isEditMode == 2) {
+                  // Edit title
+                  codeProvider.addHead(widget.code, _linkController.text);
+                  showToastMsg(context, "New title added!");
+                } else if (_isEditMode == 3) {
+                  // Delete link
+                  codeProvider.deleteLink(widget.code, _editIndex);
+                  showToastMsg(context, "Entry deleted!");
+                } else {
+                  // Add new link
+                  codeProvider.addLink(widget.code, _linkController.text);
+                  showToastMsg(context, "New entry added!");
+                }
+              }
+              setState(() {
+                _isEditMode = 0;
+                _editIndex = -1;
+              });
+              _linkController.clear();
+              FocusScope.of(context).unfocus();
+            },
+            onCancel: () {
+              if (_linkController.text.isNotEmpty) {
+                showToastMsg(context, "Action cancelled!");
+              }
+              setState(() {
+                _isEditMode = 0;
+                _editIndex = -1;
+              });
+              _linkController.clear();
+              FocusScope.of(context).unfocus();
+            },
+            controller: _linkController,
+            isEditMode: _isEditMode,
+            fabFocus: _fabFocus,
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+        ),
+      ),
+    );
+  }
+
+  /// Top bar widget showing the title and edit button
+  Widget innerPageTopBar(BuildContext context, String head) {
+    final colors = Provider.of<AppColors>(context);
+    return Container(
+      alignment: Alignment.centerLeft,
+      width: MediaQuery.of(context).size.width,
+      margin: const EdgeInsets.fromLTRB(2, 0, 2, 4),
+      height: 160,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(50),
+        color: colors.accnt,
+      ),
+      child: Stack(
+        children: [
+          // Title text (truncated if too long)
+          Positioned(
+            top: 42,
+            left: 26,
+            child: Text(
+              head.length > 12 ? "${head.substring(0, 12)}..." : head,
+              style: const TextStyle(
+                fontFamily: 'Product',
+                fontWeight: FontWeight.w700,
+                fontSize: 48,
+              ),
+            ),
+          ),
+          // Edit title button
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: IconButton(
+              tooltip: "Edit title",
+              onPressed: () {
+                setState(() {
+                  _isEditMode = 2;
+                  _linkController.text = head;
+                });
+                FocusScope.of(context).requestFocus(_fabFocus);
+              },
+              icon: const Icon(Icons.mode_edit_outline_outlined),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _linkController.dispose();
+    super.dispose();
+  }
+}
+
+/// Custom floating action bar for adding/editing/deleting links or title.
+class CustomInnerFAB extends StatelessWidget {
+  const CustomInnerFAB({
+    super.key,
+    required this.onConfirm,
+    required this.onCancel,
+    required this.controller,
+    required this.isEditMode,
+    required this.fabFocus,
+  });
+  final VoidCallback onConfirm;
+  final VoidCallback onCancel;
+  final TextEditingController controller;
+  final int isEditMode;
+  final FocusNode fabFocus;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+
+    return Container(
+      padding: const EdgeInsets.all(8),
+      width: MediaQuery.of(context).size.width - 25,
+      height: 130,
+      decoration: BoxDecoration(
+        color: colors.bgClr,
+        borderRadius: BorderRadius.circular(50),
+        border: Border.all(color: colors.fgClr, width: 1),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Text field for link or title input
+          Expanded(
+            flex: 5,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(42),
+                color: colors.box,
+              ),
+              child: TextField(
+                focusNode: fabFocus,
+                controller: controller,
+                minLines: null,
+                maxLines: null,
+                expands: true,
+                style: TextStyle(color: colors.fgClr, fontFamily: 'Product'),
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          // Confirm and cancel buttons
+          Expanded(
+            flex: 1,
+            child: Column(
+              children: [
+                const Spacer(),
+                IconButton(
+                  onPressed: onConfirm,
+                  icon: Icon(
+                    isEditMode == 0 ? Icons.add_rounded : Icons.check_rounded,
+                    color: Colors.green,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: onCancel,
+                  icon: const Icon(Icons.close_rounded, color: Colors.red),
+                ),
+                const Spacer(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+================================================
+FILE: lib/components/inner_page_fun.dart
+================================================
+import 'package:flutter/material.dart';
+import 'package:memno/theme/app_colors.dart';
+import 'package:provider/provider.dart';
+
+class InnerPageButton extends StatelessWidget {
+  const InnerPageButton({
+    super.key,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colors.btnClr,
+          shape: const CircleBorder(),
+          padding: const EdgeInsets.all(16),
+        ),
+        onPressed: onPressed,
+        child: Icon(icon, color: colors.btnIcon));
+  }
+}
+
+
+
+================================================
+FILE: lib/components/settings_page.dart
+================================================
+import 'package:flutter/material.dart';
+import 'package:memno/functionality/check_update.dart';
+import 'package:memno/functionality/import_export.dart';
+import 'package:memno/theme/app_colors.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+
+  void _showDialog(BuildContext context, String title, String content,
+      AppColors colors, VoidCallback onPressed) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: colors.box,
+        title: Text(title,
+            style: TextStyle(
+                fontFamily: 'Product', fontSize: 20, color: colors.textClr)),
+        content: Text(content,
+            style: TextStyle(
+                fontFamily: 'Product', fontSize: 18, color: colors.textClr)),
+        actions: [
+          TextButton(
+            onPressed: onPressed,
+            child: Text(
+              "OK",
+              style: TextStyle(
+                  fontFamily: 'Product', fontSize: 16, color: colors.textClr),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return Hero(
+      tag: 'fab_to_page',
+      child: Scaffold(
+          backgroundColor: colors.bgClr,
+          appBar: AppBar(
+            backgroundColor: colors.bgClr,
+            foregroundColor: colors.fgClr,
+          ),
+          body: ListView(
+            children: [
+              settingsTitle("Settings", colors),
+              settingsContainer(
+                SwitchListTile(
+                  title: Text("Dark Mode",
+                      style: TextStyle(
+                          fontFamily: 'Product',
+                          fontSize: 18,
+                          color: colors.textClr)),
+                  value: context.watch<AppColors>().isDarkMode,
+                  onChanged: (_) async {
+                    await colors.toggleTheme();
+                  },
+                ),
+                colors,
+              ),
+              settingsTitle("Data", colors),
+              settingsContainer(
+                  ListTile(
+                    onTap: () {
+                      ImportExport().exportToJSON(context);
+                    },
+                    title: Text(
+                      "Export to JSON",
+                      style: TextStyle(
+                          fontFamily: 'Product',
+                          fontSize: 18,
+                          color: colors.textClr),
+                    ),
+                    trailing:
+                        Icon(Icons.arrow_upward_rounded, color: colors.textClr),
+                  ),
+                  colors),
+              settingsContainer(
+                  ListTile(
+                    onTap: () {
+                      ImportExport().importFromJSON(context);
+                    },
+                    title: Text(
+                      "Import from JSON",
+                      style: TextStyle(
+                          fontFamily: 'Product',
+                          fontSize: 18,
+                          color: colors.textClr),
+                    ),
+                    trailing: Icon(Icons.arrow_downward_rounded,
+                        color: colors.textClr),
+                  ),
+                  colors),
+              settingsTitle("Updates", colors),
+              settingsContainer(
+                  ListTile(
+                      onTap: () async {
+                        final info = await PackageInfo.fromPlatform();
+                        final currVer = info.version; // Get current app version
+                        final buildNumber =
+                            info.buildNumber; // Get build number
+                        if (currVer.isEmpty || buildNumber.isEmpty) {
+                          _showDialog(
+                            context.mounted ? context : context,
+                            "Version Check Failed",
+                            "Could not retrieve current version.",
+                            colors,
+                            () {
+                              Navigator.pop(context);
+                            },
+                          );
+                          return;
+                        }
+                        // Get latest release data from GitHub
+                        final release = await getLatestGitHubRelease();
+                        if (release == null) {
+                          _showDialog(
+                              context.mounted ? context : context,
+                              "Update Check Failed",
+                              "Could not check for updates.",
+                              colors, () {
+                            Navigator.pop(context);
+                          });
+                          return;
+                        }
+
+                        final latestVer = release['tag_name']
+                            as String; // Obtain latest version on GitHub
+                        final browserUrl = release['assets'][0]
+                                ['browser_download_url']
+                            as String; // Obtain download link for the latest version
+                        if (browserUrl.isEmpty || latestVer.isEmpty) {
+                          _showDialog(
+                              context.mounted ? context : context,
+                              "Update Check Failed",
+                              "Could not find download link for the latest version.",
+                              colors, () {
+                            Navigator.pop(context);
+                          });
+                          return;
+                        }
+                        // Compare versions
+                        if (isNewerVersion(latestVer, currVer, buildNumber)) {
+                          _showDialog(
+                            context.mounted ? context : context,
+                            "Update Available",
+                            "A new version ($latestVer) is available. Please update to enjoy the latest features.",
+                            colors,
+                            () {
+                              Navigator.pop(context);
+                              launchUrl(Uri.parse(browserUrl));
+                            },
+                          );
+                        } else {
+                          _showDialog(
+                            context.mounted ? context : context,
+                            "No Updates",
+                            "You are using the latest version ($currVer).",
+                            colors,
+                            () {
+                              Navigator.pop(context);
+                            },
+                          );
+                        }
+                      },
+                      trailing: Icon(Icons.file_download_outlined,
+                          color: colors.textClr),
+                      title: Text(
+                        "Check for updates",
+                        style: TextStyle(
+                            fontFamily: 'Product',
+                            fontSize: 18,
+                            color: colors.textClr),
+                      )),
+                  colors),
+              settingsTitle("About", colors),
+              settingsContainer(
+                  ListTile(
+                      onTap: () {
+                        launchUrl(
+                            Uri.parse("https://github.com/jydv402/memno"));
+                      },
+                      trailing: Icon(Icons.arrow_outward_rounded,
+                          color: colors.textClr),
+                      title: Text(
+                        "Find us on GitHub",
+                        style: TextStyle(
+                            fontFamily: 'Product',
+                            fontSize: 18,
+                            color: colors.textClr),
+                      )),
+                  colors),
+            ],
+          )),
+    );
+  }
+
+  Padding settingsTitle(String title, AppColors colors) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(32, 16, 0, 16),
+      child: Text(title,
+          style: TextStyle(
+              fontFamily: 'Product', fontSize: 28, color: colors.textClr)),
+    );
+  }
+
+  Container settingsContainer(Widget child, AppColors colors) {
+    return Container(
+      height: 100,
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(2, 4, 2, 4),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50), color: colors.box),
+      child: child,
+    );
+  }
+}
+
+
+
+================================================
+FILE: lib/components/show_toast.dart
+================================================
+import 'package:delightful_toast/delight_toast.dart';
+import 'package:delightful_toast/toast/components/toast_card.dart';
+import 'package:delightful_toast/toast/utils/enums.dart';
+import 'package:flutter/material.dart';
+import 'package:memno/theme/app_colors.dart';
+import 'package:provider/provider.dart';
+
+void showToastMsg(BuildContext context, String msg) {
+  final colors = Provider.of<AppColors>(context, listen: false);
+  DelightToastBar(
+    autoDismiss: true,
+    snackbarDuration: const Duration(seconds: 2),
+    position: DelightSnackbarPosition.top,
+    builder: (context) => ToastCard(
+      color: colors.toastBg,
+      title: Text(
+        msg,
+        style: TextStyle(fontFamily: 'Product', color: colors.toastText),
+      ),
+    ),
+  ).show(context);
+}
+
+
+
+================================================
+FILE: lib/components/sub_tile.dart
+================================================
+import 'package:flutter/material.dart';
+import 'package:memno/components/inner_page.dart';
+import 'package:memno/components/show_toast.dart';
+import 'package:memno/functionality/code_gen.dart';
+import 'package:memno/theme/app_colors.dart';
+import 'package:provider/provider.dart';
+
+Widget subTile(BuildContext context, int code, String date, bool isLiked) {
+  int length = context.read<CodeGen>().getLinkListLength(code);
+  double radius = 50;
+
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
+    child: SubTileStack(
+        code: code,
+        date: date,
+        isLiked: isLiked,
+        length: length,
+        radius: radius),
+  );
+}
+
+class SubTileStack extends StatefulWidget {
+  const SubTileStack(
+      {super.key,
+      required this.code,
+      required this.date,
+      required this.isLiked,
+      required this.length,
+      required this.radius});
+
+  final int code;
+  final String date;
+  final bool isLiked;
+  final int length;
+  final double radius;
+
+  @override
+  State<SubTileStack> createState() => _SubTileStackState();
+}
+
+class _SubTileStackState extends State<SubTileStack> {
+  bool showDltConfirm = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        //Background Container
+        BgContainer(
+          radius: widget.radius,
+        ),
+        if (!showDltConfirm) ...[
+          //Code Text
+          CodeText(code: widget.code),
+          //Head Text
+          HeadText(code: widget.code),
+          //Length indicator
+          LengthIndicator(
+            radius: widget.radius,
+            length: widget.length,
+            code: widget.code,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => InnerPage(code: widget.code),
+                ),
+              );
+            },
+          ),
+          //Date Time Indicator
+          DateTimeIndicator(date: widget.date),
+          //Like Button
+          LikeButton(code: widget.code, isLiked: widget.isLiked),
+          //Delete Button
+          DltButton(
+            code: widget.code,
+            onPressed: () {
+              setState(() {
+                showDltConfirm = true;
+              });
+            },
+          ),
+        ] else ...[
+          ShowDltPrompt(
+            length: widget.length,
+            radius: widget.radius,
+            onProceed: () {
+              context.read<CodeGen>().clearList(widget.code);
+              setState(() {
+                showDltConfirm = false;
+              });
+              showToastMsg(context, "Code #${widget.code} deleted");
+            },
+            onCancel: () {
+              setState(() {
+                showDltConfirm = false;
+              });
+              showToastMsg(context, "Action cancelled");
+            },
+          )
+        ]
+      ],
+    );
+  }
+}
+
+class ShowDltPrompt extends StatelessWidget {
+  const ShowDltPrompt({
+    super.key,
+    required this.length,
+    required this.radius,
+    required this.onProceed,
+    required this.onCancel,
+  });
+
+  final int length;
+  final double radius;
+  final VoidCallback onProceed;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: 220,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("You sure you want to delete?\nCurrently contains $length items",
+              style: TextStyle(
+                  color: colors.textClr, fontSize: 16, fontFamily: 'Product'),
+              textAlign: TextAlign.center),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ContainerButton(onTap: onCancel, radius: radius, text: "No"),
+              const SizedBox(width: 20),
+              ContainerButton(onTap: onProceed, radius: radius, text: "Yes"),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class ContainerButton extends StatelessWidget {
+  const ContainerButton({
+    super.key,
+    required this.onTap,
+    required this.radius,
+    required this.text,
+  });
+
+  final VoidCallback onTap;
+  final double radius;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+          width: 120,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: colors.pill,
+            borderRadius: BorderRadius.circular(radius),
+          ),
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: colors.textClr, fontFamily: 'Product'),
+          )),
+    );
+  }
+}
+
+class BgContainer extends StatelessWidget {
+  const BgContainer({
+    super.key,
+    required this.radius,
+  });
+
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return Container(
+      height: 240,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        color: colors.box,
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
+  }
+}
+
+class CodeText extends StatelessWidget {
+  const CodeText({
+    super.key,
+    required this.code,
+  });
+
+  final int code;
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return Positioned(
+      bottom: 16,
+      left: 26,
+      child: SelectableText(
+        "#$code",
+        style: TextStyle(
+            color: colors.textClr,
+            fontSize: 26,
+            fontWeight: FontWeight.w400,
+            fontFamily: 'Product'),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
+class HeadText extends StatelessWidget {
+  const HeadText({
+    super.key,
+    required this.code,
+  });
+
+  final int code;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    String head = Provider.of<CodeGen>(context).getHeadForCode(code);
+    return Positioned(
+        bottom: 96,
+        left: 26,
+        child: Text(
+          head.length > 18 ? "${head.substring(0, 18)}..." : head,
+          style: TextStyle(
+              color: colors.textClr,
+              fontSize: 36,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Product'),
+          textAlign: TextAlign.center,
+        ));
+  }
+}
+
+class LengthIndicator extends StatelessWidget {
+  const LengthIndicator({
+    super.key,
+    required this.radius,
+    required this.length,
+    required this.code,
+    required this.onTap,
+  });
+
+  final double radius;
+  final int length;
+  final int code;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return Positioned(
+      bottom: 16,
+      right: 16,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 130,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: colors.pill,
+            borderRadius: BorderRadius.circular(radius),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.arrow_outward_rounded,
+                  color: colors.iconClr, size: 14),
+              const Spacer(),
+              Text(
+                length == 1 ? "$length  Entry" : "$length Entries",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Product',
+                  color: colors.textClr,
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DateTimeIndicator extends StatelessWidget {
+  const DateTimeIndicator({
+    super.key,
+    required this.date,
+  });
+
+  final String date;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return Positioned(
+        top: 28,
+        left: 26,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.calendar_month_outlined,
+              color: colors.iconClr,
+              size: 22,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              getFormattedDate(DateTime.parse(date)),
+              textAlign: TextAlign.center,
+              style: TextStyle(color: colors.textClr, fontFamily: 'Product'),
+            ),
+          ],
+        ));
+  }
+}
+
+class LikeButton extends StatelessWidget {
+  const LikeButton({
+    super.key,
+    required this.code,
+    required this.isLiked,
+  });
+
+  final int code;
+  final bool isLiked;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return Positioned(
+      right: 84,
+      top: 16,
+      child: ElevatedButton(
+        key: ValueKey(code),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colors.btnClr,
+          shape: const CircleBorder(),
+          padding: const EdgeInsets.all(16),
+        ),
+        onPressed: () {
+          context.read<CodeGen>().toggleLike(code);
+          if (isLiked) {
+            showToastMsg(context, "#$code removed from favorites");
+          } else {
+            showToastMsg(context, "#$code added to favorites");
+          }
+        },
+        child: isLiked == true
+            ? const Icon(Icons.favorite_rounded, color: Colors.red)
+            : Icon(Icons.favorite_border_rounded, color: colors.btnIcon),
+      ),
+    );
+  }
+}
+
+class DltButton extends StatelessWidget {
+  const DltButton({
+    super.key,
+    required this.code,
+    required this.onPressed,
+  });
+
+  final int code;
+  final VoidCallback onPressed;
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return Positioned(
+      right: 14,
+      top: 16,
+      child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: colors.btnClr,
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(16),
+          ),
+          onPressed: onPressed,
+          child: Icon(Icons.close_rounded, color: colors.btnIcon)),
+    );
+  }
+}
+
+class DeleteConfirmation extends StatelessWidget {
+  final VoidCallback onConfirm;
+  final VoidCallback onCancel;
+
+  const DeleteConfirmation(
+      {super.key, required this.onConfirm, required this.onCancel});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Provider.of<AppColors>(context);
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Are you sure you want to delete this item?',
+            style: TextStyle(
+                color: colors.textClr,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Product'),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: onCancel,
+                style: ElevatedButton.styleFrom(backgroundColor: colors.pill),
+                child: Text(
+                  'Cancel',
+                  style:
+                      TextStyle(color: colors.textClr, fontFamily: 'Product'),
+                ),
+              ),
+              const SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: onConfirm,
+                style: ElevatedButton.styleFrom(backgroundColor: colors.pill),
+                child: Text(
+                  'Delete',
+                  style:
+                      TextStyle(color: colors.textClr, fontFamily: 'Product'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+const List months = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+String getFormattedDate(DateTime date) {
+  if (date.hour > 12) {
+    if (date.hour == 24) {
+      return "${date.day} ${months[date.month - 1]} ${date.year}, 12:${date.minute} pm";
+    }
+    return "${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour - 12}:${date.minute} pm";
+  } else {
+    if (date.hour == 0) {
+      return "${date.day} ${months[date.month - 1]} ${date.year}, 12:${date.minute} am";
+    }
+    return "${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour}:${date.minute} am";
+  }
+}
+
+
+
+================================================
+FILE: lib/database/code_data.dart
+================================================
+import 'package:hive/hive.dart';
+
+part 'code_data.g.dart';
+
+@HiveType(typeId: 0)
+class CodeData extends HiveObject {
+  @HiveField(0)
+  int code;
+
+  @HiveField(1)
+  List<String> links;
+
+  @HiveField(2)
+  String date;
+
+  @HiveField(3)
+  bool liked;
+
+  @HiveField(4)
+  String head;
+
+  CodeData(this.code, this.links, this.date, this.liked, this.head);
+
+  // toJSON function
+  Map<String, dynamic> toJSON() {
+    return {
+      'code': code,
+      'head': head,
+      'links': links,
+      'liked': liked,
+      'date': date,
+    };
+  }
+
+  // fromJSON fucntion
+  factory CodeData.fromJSON(Map<String, dynamic> json) {
+    return CodeData(
+      json['code'] as int,
+      List<String>.from(json['links'] as List),
+      json['date'] as String,
+      json['liked'] as bool,
+      json['head'] as String,
+    );
+  }
+}
+
+
+
+================================================
+FILE: lib/database/code_data.g.dart
+================================================
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'code_data.dart';
+
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
+class CodeDataAdapter extends TypeAdapter<CodeData> {
+  @override
+  final int typeId = 0;
+
+  @override
+  CodeData read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return CodeData(
+      fields[0] as int,
+      (fields[1] as List).cast<String>(),
+      fields[2] as String,
+      fields[3] as bool,
+      fields[4] as String,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, CodeData obj) {
+    writer
+      ..writeByte(5)
+      ..writeByte(0)
+      ..write(obj.code)
+      ..writeByte(1)
+      ..write(obj.links)
+      ..writeByte(2)
+      ..write(obj.date)
+      ..writeByte(3)
+      ..write(obj.liked)
+      ..writeByte(4)
+      ..write(obj.head);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CodeDataAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+
+
+================================================
+FILE: lib/database/preview_data.dart
+================================================
+import 'package:hive/hive.dart';
+
+part 'preview_data.g.dart';
+
+@HiveType(typeId: 2)
+class PreviewDataModel {
+  @HiveField(0)
+  final String? title;
+
+  @HiveField(1)
+  final String? description;
+
+  @HiveField(2)
+  final String? image;
+
+  @HiveField(3)
+  final double? imageHeight;
+
+  @HiveField(4)
+  final double? imageWidth;
+
+  @HiveField(5)
+  final String? link;
+
+  PreviewDataModel({
+    this.title,
+    this.description,
+    this.image,
+    this.imageHeight,
+    this.imageWidth,
+    this.link,
+  });
+}
+
+
+
+================================================
+FILE: lib/database/preview_data.g.dart
+================================================
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'preview_data.dart';
+
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
+class PreviewDataModelAdapter extends TypeAdapter<PreviewDataModel> {
+  @override
+  final int typeId = 2;
+
+  @override
+  PreviewDataModel read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return PreviewDataModel(
+      title: fields[0] as String?,
+      description: fields[1] as String?,
+      image: fields[2] as String?,
+      imageHeight: fields[3] as double?,
+      imageWidth: fields[4] as double?,
+      link: fields[5] as String?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, PreviewDataModel obj) {
+    writer
+      ..writeByte(6)
+      ..writeByte(0)
+      ..write(obj.title)
+      ..writeByte(1)
+      ..write(obj.description)
+      ..writeByte(2)
+      ..write(obj.image)
+      ..writeByte(3)
+      ..write(obj.imageHeight)
+      ..writeByte(4)
+      ..write(obj.imageWidth)
+      ..writeByte(5)
+      ..write(obj.link);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PreviewDataModelAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+
+
+================================================
+FILE: lib/database/toggles_data.dart
+================================================
+import 'package:hive/hive.dart';
+
+part 'toggles_data.g.dart';
+
+@HiveType(typeId: 1)
+class TogglesData extends HiveObject {
+  @HiveField(0)
+  bool darkMode;
+
+  TogglesData({this.darkMode = false});
+}
+
+
+
+================================================
+FILE: lib/database/toggles_data.g.dart
+================================================
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'toggles_data.dart';
+
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
+class TogglesDataAdapter extends TypeAdapter<TogglesData> {
+  @override
+  final int typeId = 1;
+
+  @override
+  TogglesData read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return TogglesData(
+      darkMode: fields[0] as bool,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, TogglesData obj) {
+    writer
+      ..writeByte(1)
+      ..writeByte(0)
+      ..write(obj.darkMode);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TogglesDataAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+
+
+================================================
+FILE: lib/functionality/check_update.dart
+================================================
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+Future<Map<String, dynamic>?> getLatestGitHubRelease() async {
+  final response = await http.get(Uri.parse(
+    "https://api.github.com/repos/jydv402/memno/releases/latest",
+  ));
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    return null;
+  }
+}
+
+bool isNewerVersion(String latest, String current, String buildNumber) {
+  //print("Comparing versions: Latest: $latest, Current: $current");
+  // eg latest = "1.2.3+11", current = "1.2.2"
+  // Remove after '+' if present in latest version
+  final latestParts = latest.split('+')[0].split('.').map(int.parse).toList() +
+      (latest.contains('+') ? [int.parse(latest.split('+')[1])] : []);
+  final currentParts =
+      current.split('.').map(int.parse).toList() + [int.parse(buildNumber)];
+
+  //print("Latest parts: $latestParts, Current parts: $currentParts");
+
+  for (int i = 0; i < latestParts.length; i++) {
+    if (i >= currentParts.length || latestParts[i] > currentParts[i]) {
+      return true;
+    } else if (latestParts[i] < currentParts[i]) {
+      return false;
+    }
+  }
+  return false;
+}
+
+
+
+================================================
+FILE: lib/functionality/code_gen.dart
+================================================
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:memno/database/code_data.dart';
+
+class CodeGen extends ChangeNotifier {
+  late Box<CodeData> _codeBox;
+  bool _isReady = false;
+  final bool liked = false;
+  final String head = "Untitled";
+
+  CodeGen() {
+    init();
+  }
+
+  //initializes hive
+  Future<void> init() async {
+    Hive.registerAdapter(CodeDataAdapter());
+    _codeBox = await Hive.openBox<CodeData>('codeData');
+    _isReady = true;
+    notifyListeners();
+  }
+
+  bool get isReady => _isReady;
+
+  List<int> get codeList {
+    return _codeBox.values.map((codeData) => codeData.code).toList();
+  }
+
+  //generates 6 digit code
+  Future<void> generateCode() async {
+    var rnd = Random();
+    int code;
+    do {
+      code = 100000 + (rnd.nextInt(900000));
+    } while (_codeBox.values.any((codeData) => codeData.code == code));
+
+    await _codeBox
+        .add(CodeData(code, [], DateTime.now().toString(), liked, head));
+    notifyListeners();
+  }
+
+  //deletes a specific code
+  Future<void> clearList(int code) async {
+    var key =
+        _codeBox.keys.firstWhere((key) => _codeBox.get(key)!.code == code);
+    await _codeBox.delete(key);
+    notifyListeners();
+  }
+
+  //return the lenght of link list
+  int getLinkListLength(int code) {
+    final codeData =
+        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    //orElse: () => CodeData(code, [], date, liked, head));
+    return codeData.links.length;
+  }
+
+  //returns date
+  String getDateForCode(int code) {
+    final codeData =
+        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    //orElse: () => CodeData(code, [], date, liked, head));
+
+    return codeData.date;
+  }
+
+  //returns liked status
+  bool getLikeForCode(int code) {
+    final codeData =
+        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    //orElse: () => CodeData(code, [], date, liked, head));
+    return codeData.liked;
+  }
+
+  //toggle like
+  Future<void> toggleLike(int code) async {
+    final codeData =
+        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    //orElse: () => CodeData(code, [], date, liked, head));
+    codeData.liked = !codeData.liked;
+    await codeData.save();
+    notifyListeners();
+  }
+
+  //returns list of links
+  List<String> getLinksForCode(int code) {
+    final codeData =
+        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    //orElse: () => CodeData(code, [], date, liked, head));
+
+    return codeData.links;
+  }
+
+  //Add heading text
+  Future<void> addHead(int code, String head) async {
+    final codeData =
+        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    //orElse: () => CodeData(code, [], date, liked, head));
+    codeData.head = head;
+    await codeData.save();
+    notifyListeners();
+  }
+
+  //returns heading text
+  String getHeadForCode(int code) {
+    final codeData =
+        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    //orElse: () => CodeData(code, [], date, liked, head));
+    return codeData.head;
+  }
+
+  //Add link to a specific code
+  Future<void> addLink(int code, String link) async {
+    final codeData =
+        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    //orElse: () => CodeData(code, [], date, liked, head));
+    codeData.links.add(link);
+    await codeData.save();
+    notifyListeners();
+  }
+
+  //Edit links within a specific code
+  Future<void> editLink(int code, int index, String newLink) async {
+    final codeData =
+        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    //orElse: () => CodeData(code, [], date, liked, head));
+    if (codeData.links.length > index) {
+      codeData.links[index] = newLink;
+      await codeData.save();
+      notifyListeners();
+    }
+  }
+
+  //Delete link within a specific code
+  Future<void> deleteLink(int code, int index) async {
+    final codeData =
+        _codeBox.values.firstWhere((codeData) => codeData.code == code);
+    //orElse: () => CodeData(code, [], date, liked, head));
+    if (codeData.links.length > index) {
+      codeData.links.removeAt(index);
+      codeData.save();
+      notifyListeners();
+    }
+  }
+
+  // reloads the code box
+  Future<void> reloadCodeBox() async {
+    _codeBox = await Hive.openBox<CodeData>('codeData');
+    _isReady = true;
+    notifyListeners();
+  }
+}
+
+
+
+================================================
+FILE: lib/functionality/import_export.dart
+================================================
+import 'dart:convert';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:memno/components/show_toast.dart';
+import 'package:memno/database/code_data.dart';
+import 'package:memno/functionality/code_gen.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
+
+class ImportExport {
+// TODO: Add import and export functionality using JSON file
+
+  late Box<CodeData>? _codeBox;
+  bool _isLoaded = false;
+
+  ImportExport() {
+    _loadCodeBox();
+  }
+
+  // Load the code box
+  Future<void> _loadCodeBox() async {
+    try {
+      if (!Hive.isBoxOpen('codeData')) {
+        _codeBox = await Hive.openBox<CodeData>('codeData');
+      } else {
+        _codeBox = Hive.box<CodeData>('codeData');
+      }
+      _isLoaded = true;
+    } catch (e) {
+      debugPrint('ImportExport _loadCodeBox error: $e');
+    }
+  }
+
+  // Export to JSON function
+  Future<void> exportToJSON(BuildContext context) async {
+    try {
+      await _loadCodeBox();
+      if (_codeBox == null) return;
+
+      // Collect the notes
+      final notes = _codeBox!.values.map((note) => note.toJSON()).toList();
+
+      // Get app data
+      final pkgInfo = await PackageInfo.fromPlatform();
+
+      final appDetails = {
+        "app": "Memno",
+        "version": pkgInfo.version,
+        "schema_version": 1,
+        "exported_at": DateTime.now().toUtc().toIso8601String(),
+        "notes": notes,
+      };
+
+      // Encode JSON
+      final json = const JsonEncoder.withIndent('  ').convert(appDetails);
+      // Convert the JSON to UTF8 bytes, returns a list of int
+      // Then convert the int list to Uint8List as SAF (Storage Access Framework) demands it
+      final bytes = Uint8List.fromList(utf8.encode(json));
+
+      // Clear the temporary files
+      await FilePicker.platform.clearTemporaryFiles();
+
+      // Get the save destination
+      // Write the file
+      final result = await FilePicker.platform.saveFile(
+        dialogTitle: 'Export Memno Notes',
+        fileName: 'memno_notes.json',
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        bytes: bytes,
+      );
+
+      // Show cancelled message if the export is cancelled halfway
+      if (result == null) {
+        if (context.mounted) {
+          showToastMsg(context, 'Export Cancelled');
+        }
+        return;
+      }
+
+      // Show success message
+      if (context.mounted) {
+        showToastMsg(context, 'Successfully Exported to JSON');
+      }
+    } catch (e) {
+      debugPrint('ExportToJSON error: $e');
+      if (context.mounted) {
+        showToastMsg(context, e.toString());
+      }
+    }
+  }
+
+  // Import from JSON function
+  Future<void> importFromJSON(BuildContext context) async {
+    try {
+      await _loadCodeBox();
+      if (_codeBox == null) return;
+
+      // Get the file
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        withData: true,
+      );
+      // Show cancelled message if the import is cancelled halfway
+      if (result == null) {
+        if (context.mounted) {
+          showToastMsg(context, 'Import Cancelled');
+        }
+        return;
+      }
+
+      // Decode JSON
+      final bytes = result.files.first.bytes;
+      final jsonString = utf8.decode(bytes!);
+      final json = jsonDecode(jsonString) as Map<String, dynamic>;
+
+      // Get the notes
+      final notes = json['notes'] as List;
+
+      // Add the notes to the box
+      for (final note in notes) {
+        final codeData = CodeData.fromJSON(note);
+        await _codeBox!.put(codeData.code, codeData);
+      }
+
+      // Reload the code box
+      if (context.mounted) {
+        context.read<CodeGen>().reloadCodeBox();
+      }
+
+      // Show success message
+      if (context.mounted) {
+        showToastMsg(context, 'Successfully Imported from JSON');
+      }
+    } catch (e) {
+      debugPrint('ImportFromJSON error: $e');
+      if (context.mounted) {
+        showToastMsg(context, e.toString());
+      }
+    }
+  }
+}
+
+
+
+================================================
+FILE: lib/functionality/preview_map.dart
+================================================
+import 'package:flutter/material.dart';
+import 'package:flutter_chat_core/flutter_chat_core.dart';
+import 'package:hive/hive.dart';
+import 'package:memno/database/preview_data.dart';
+
+class PreviewMap extends ChangeNotifier {
+  // final Box _previewBox = Hive.box('previewsBox');
+  final Map<String, LinkPreviewData> cache = {};
+
+  Box<PreviewDataModel>? _previewBox;
+
+  bool _isInit = false;
+
+  PreviewMap() {
+    _init();
+  }
+
+  Future<void> _init() async {
+    try {
+      if (!Hive.isBoxOpen('previewsBox')) {
+        // Open the box if it is not already open
+        _previewBox = await Hive.openBox<PreviewDataModel>('previewsBox');
+      } else {
+        // Get the box if it is already open
+        _previewBox = Hive.box<PreviewDataModel>('previewsBox');
+      }
+      _isInit = true;
+    } catch (e, st) {
+      debugPrint('PreviewMap init error: $e\n$st');
+      // Set _previewBox to null if initialization fails
+      _previewBox = null;
+    }
+    notifyListeners();
+  }
+
+  // Save a preview
+  Future<void> savePreview(String link, LinkPreviewData data) async {
+    try {
+      if (!_isInit) await _init();
+      if (_previewBox == null) return;
+      final model = PreviewDataModel(
+        title: data.title,
+        description: data.description,
+        link: data.link,
+        image: data.image?.url,
+        imageHeight: data.image?.height,
+        imageWidth: data.image?.width,
+      );
+      await _previewBox!.put(link, model);
+      cache[link] = data;
+    } catch (e) {
+      debugPrint('savePreview error: $e');
+    }
+  }
+
+  // Load a preview
+  LinkPreviewData? loadPreviewSync(String link) {
+    try {
+      if (_previewBox != null && _previewBox!.isOpen) {
+        final model = _previewBox!.get(link);
+        if (model == null) return null;
+        final preview = LinkPreviewData(
+          title: model.title,
+          description: model.description,
+          link: model.link!,
+          image: model.image != null
+              ? ImagePreviewData(
+                  url: model.image!,
+                  height: model.imageHeight ?? 0,
+                  width: model.imageWidth ?? 0,
+                )
+              : null,
+        );
+        cache[link] = preview;
+        return preview;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      debugPrint('loadPreviewSync error: $e');
+      return null;
+    }
+  }
+
+  // Load all previews into cache (e.g., on startup)
+  Future<LinkPreviewData?> loadPreview(String link) async {
+    try {
+      if (!_isInit) await _init();
+      if (_previewBox == null) return null;
+      final model = _previewBox!.get(link);
+      if (model == null) return null;
+      final preview = LinkPreviewData(
+        title: model.title,
+        description: model.description,
+        link: model.link!,
+        image: model.image != null
+            ? ImagePreviewData(
+                url: model.image!,
+                height: model.imageHeight ?? 0,
+                width: model.imageWidth ?? 0,
+              )
+            : null,
+      );
+      cache[link] = preview;
+      return preview;
+    } catch (e) {
+      debugPrint('loadPreview error: $e');
+      return null;
+    }
+  }
+}
+
+
+
+================================================
+FILE: lib/theme/app_colors.dart
+================================================
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:memno/database/toggles_data.dart';
+
+class AppColors extends ChangeNotifier {
+  late Box<TogglesData> _togglesBox;
+  // Check if system is in dark mode
+  bool _isDarkMode =
+      PlatformDispatcher.instance.platformBrightness == Brightness.dark;
+
+  AppColors() {
+    init();
+  }
+
+  Future<void> init() async {
+    Hive.registerAdapter(TogglesDataAdapter());
+    _togglesBox = await Hive.openBox<TogglesData>('togglesData');
+
+    TogglesData? togglesData = _togglesBox.get(0);
+    _isDarkMode = togglesData?.darkMode ?? false;
+    notifyListeners();
+  }
+
+  bool get isDarkMode => _isDarkMode;
+
+  final _light = LightColors();
+  final _dark = DarkColors();
+
+  Future<void> toggleTheme() async {
+    _isDarkMode = !_isDarkMode;
+    TogglesData togglesData = TogglesData(darkMode: _isDarkMode);
+    await _togglesBox.put(0, togglesData);
+    notifyListeners();
+  }
+
+  Color get bgClr => _isDarkMode ? _dark.bgClr : _light.bgClr;
+  Color get fgClr => _isDarkMode ? _dark.fgClr : _light.fgClr;
+  Color get box => _isDarkMode ? _dark.box : _light.box;
+  Color get search => _isDarkMode ? _dark.search : _light.search;
+  Color get accnt => _isDarkMode ? _dark.accnt : _light.accnt;
+  Color get accntPill => _isDarkMode ? _dark.accntPill : _light.accntPill;
+  Color get accntText => _isDarkMode ? _dark.accntText : _light.accntText;
+  Color get textClr => _isDarkMode ? _dark.textClr : _light.textClr;
+  Color get iconClr => _isDarkMode ? _dark.iconClr : _light.iconClr;
+  Color get btnClr => _isDarkMode ? _dark.btnClr : _light.btnClr;
+  Color get btnIcon => _isDarkMode ? _dark.btnIcon : _light.btnIcon;
+  Color get pill => _isDarkMode ? _dark.pill : _light.pill;
+  Color get toastBg => _isDarkMode ? _dark.toastBg : _light.toastBg;
+  Color get toastText => _isDarkMode ? _dark.toastText : _light.toastText;
+}
+
+class LightColors {
+  final Color bgClr = Colors.white;
+  final Color fgClr = Colors.black;
+  final Color box = Colors.grey[100]!;
+  final Color search = Colors.black;
+  final Color accnt = const Color(0xFFdafc08);
+  final Color accntPill = const Color(0xFFf6fec2);
+  final Color accntText = Colors.black;
+  final Color textClr = Colors.black;
+  final Color iconClr = Colors.black;
+  final Color btnClr = Colors.black;
+  final Color btnIcon = Colors.white;
+  final Color pill = Colors.grey[300]!;
+  final Color toastBg = Colors.grey[900]!;
+  final Color toastText = Colors.white;
+}
+
+class DarkColors {
+  final Color bgClr = Colors.black;
+  final Color fgClr = Colors.white;
+  final Color box = Colors.grey[900]!;
+  final Color search = const Color(0xFFdafc08);
+  final Color accnt = const Color(0xFFdafc08);
+  final Color accntPill = Colors.black;
+  final Color accntText = Colors.white;
+  final Color textClr = Colors.white;
+  final Color iconClr = Colors.white;
+  final Color btnClr = Colors.grey[800]!.withOpacity(0.5);
+  final Color btnIcon = Colors.white;
+  final Color pill = Colors.grey[800]!;
+  final Color toastBg = Colors.grey[100]!;
+  final Color toastText = Colors.black;
+}
+
+
