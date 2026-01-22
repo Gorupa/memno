@@ -135,6 +135,8 @@ If you find this app useful:
 
 Let’s build something beautiful, simple, and helpful together.
 
+Currently a user? Leave in your experience [here](https://forms.gle/8XHvADGkSAq3QfBm8)
+
 ---
 
 > **Built with ❤️ by [JD](https://github.com/jydv402)** — striving to create tools that make life a little simpler.
