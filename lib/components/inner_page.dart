@@ -10,6 +10,7 @@ import 'package:memno/functionality/code_gen.dart';
 import 'package:memno/functionality/preview_map.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Main page widget for displaying and editing a list of links and a title.
 class InnerPage extends StatefulWidget {
@@ -108,6 +109,13 @@ class _InnerPageState extends State<InnerPage>
                                               padding: .fromLTRB(22, 90, 22, 0),
                                               child: LinkifyText(
                                                 links[index - 1],
+                                                onTap: (link) {
+                                                  launchUrl(
+                                                    Uri.parse(link.value!),
+                                                    mode: LaunchMode
+                                                        .externalApplication,
+                                                  );
+                                                },
                                                 linkStyle: TextStyle(
                                                   color: Colors.blue[300],
                                                   fontFamily: 'Product',
