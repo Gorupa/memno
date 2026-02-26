@@ -132,6 +132,10 @@ If you find this app useful:
 - 🌟 Star the repo
 - 🐞 Report any issues
 - 📢 Spread the word with your friends
+- ❤️ Love the app and wanna share your support for keeping the app going? <a href="https://buymeachai.ezee.li/jydv402" target="_blank">
+  <img src="https://buymeachai.ezee.li/assets/images/buymeachai-button.png" alt="Buy Me A Chai" width="120" height="40">
+</a>
+
 
 Let’s build something beautiful, simple, and helpful together.
 
