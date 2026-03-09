@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
 
 Future<Map<String, dynamic>?> getLatestGitHubRelease() async {
@@ -14,6 +16,63 @@ Future<Map<String, dynamic>?> getLatestGitHubRelease() async {
     }
   } catch (e) {
     return null;
+  }
+}
+
+/// Returns the correct APK download URL for the device's CPU architecture.
+/// Falls back to the first .apk asset if no arch-specific match is found.
+String? getDownloadUrlForDevice(Map<String, dynamic> release) {
+  final assets = release['assets'] as List<dynamic>?;
+  if (assets == null || assets.isEmpty) return null;
+
+  // Map Dart's architecture strings to the APK filename conventions
+  final arch = _getDeviceArch();
+
+  // Try to find an asset matching this device's architecture
+  for (final asset in assets) {
+    final name = (asset['name'] as String?)?.toLowerCase() ?? '';
+    if (name.endsWith('.apk') && name.contains(arch)) {
+      return asset['browser_download_url'] as String?;
+    }
+  }
+
+  // Fallback: return the first .apk asset
+  for (final asset in assets) {
+    final name = (asset['name'] as String?)?.toLowerCase() ?? '';
+    if (name.endsWith('.apk')) {
+      return asset['browser_download_url'] as String?;
+    }
+  }
+
+  return null;
+}
+
+/// Detects the device CPU architecture and maps it to standard APK ABI names.
+String _getDeviceArch() {
+  // SysInfo.kernelArchitecture returns values like "aarch64", "armv7l", "x86_64"
+  final machine = _getMachineArch();
+
+  if (machine.contains('aarch64') || machine.contains('arm64')) {
+    return 'arm64-v8a';
+  } else if (machine.contains('arm')) {
+    return 'armeabi-v7a';
+  } else if (machine.contains('x86_64') || machine.contains('amd64')) {
+    return 'x86_64';
+  }
+
+  // Default fallback for unknown architectures
+  return 'arm64-v8a';
+}
+
+/// Gets the machine architecture string from the OS.
+String _getMachineArch() {
+  try {
+    // On Android/Linux, `uname -m` returns the architecture
+    final result = Process.runSync('uname', ['-m']);
+    return (result.stdout as String).trim().toLowerCase();
+  } catch (_) {
+    // Fallback: most Android devices are arm64
+    return 'aarch64';
   }
 }
 
