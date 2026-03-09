@@ -9,6 +9,9 @@ import 'package:memno/home.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
+/// Global navigator key used by share intent handler to push ShareTargetPage.
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize Hive and register adapters
@@ -48,6 +51,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Memno',
       debugShowCheckedModeBanner: false,
       home: const HomePage(),
