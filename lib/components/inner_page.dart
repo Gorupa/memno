@@ -1,7 +1,6 @@
 import 'package:any_link_preview/any_link_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_chat_types/flutter_chat_types.dart' show PreviewData;
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 import 'package:linkfy_text/linkfy_text.dart';
 import 'package:memno/components/inner_page_fun.dart';
@@ -10,6 +9,7 @@ import 'package:memno/functionality/code_gen.dart';
 import 'package:memno/functionality/preview_map.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Main page widget for displaying and editing a list of links and a title.
 class InnerPage extends StatefulWidget {
@@ -24,8 +24,6 @@ class _InnerPageState extends State<InnerPage>
     with SingleTickerProviderStateMixin {
   final TextEditingController _linkController = TextEditingController();
   final FocusNode _fabFocus = FocusNode();
-
-  Map<String, PreviewData> fetched = {};
 
   int _isEditMode = 0; // 0: add, 1: edit, 2: edit title, 3: delete
   int _editIndex = -1; // Index of the item being edited/deleted
@@ -108,6 +106,13 @@ class _InnerPageState extends State<InnerPage>
                                               padding: .fromLTRB(22, 90, 22, 0),
                                               child: LinkifyText(
                                                 links[index - 1],
+                                                onTap: (link) {
+                                                  launchUrl(
+                                                    Uri.parse(link.value!),
+                                                    mode: LaunchMode
+                                                        .externalApplication,
+                                                  );
+                                                },
                                                 linkStyle: TextStyle(
                                                   color: Colors.blue[300],
                                                   fontFamily: 'Product',
@@ -279,15 +284,69 @@ class _InnerPageState extends State<InnerPage>
                                       InnerPageButton(
                                         icon: Icons.delete_rounded,
                                         onPressed: () {
-                                          setState(() {
-                                            _isEditMode = 3;
-                                            _editIndex = index - 1;
-                                            _linkController.text =
-                                                "Do you want to delete entry no.$index ? This is irreversible.";
-                                          });
-                                          FocusScope.of(
+                                          final colors = Provider.of<AppColors>(
                                             context,
-                                          ).requestFocus(_fabFocus);
+                                            listen: false,
+                                          );
+                                          showDialog(
+                                            context: context,
+                                            builder: (dialogContext) => AlertDialog(
+                                              backgroundColor: colors.box,
+                                              title: Text(
+                                                "Delete Entry",
+                                                style: TextStyle(
+                                                  fontFamily: 'Product',
+                                                  color: colors.textClr,
+                                                ),
+                                              ),
+                                              content: Text(
+                                                "Do you want to delete entry no.$index? This is irreversible.",
+                                                style: TextStyle(
+                                                  fontFamily: 'Product',
+                                                  color: colors.textClr,
+                                                ),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                        dialogContext,
+                                                      ),
+                                                  child: Text(
+                                                    "Cancel",
+                                                    style: TextStyle(
+                                                      fontFamily: 'Product',
+                                                      color: colors.textClr,
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(
+                                                      dialogContext,
+                                                    );
+                                                    context
+                                                        .read<CodeGen>()
+                                                        .deleteLink(
+                                                          widget.code,
+                                                          index - 1,
+                                                        );
+                                                    showToastMsg(
+                                                      context,
+                                                      "Entry deleted!",
+                                                    );
+                                                  },
+                                                  child: Text(
+                                                    "Delete",
+                                                    style: TextStyle(
+                                                      fontFamily: 'Product',
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
                                         },
                                       ),
                                     ],
@@ -342,10 +401,6 @@ class _InnerPageState extends State<InnerPage>
                   // Edit title
                   codeProvider.addHead(widget.code, _linkController.text);
                   showToastMsg(context, "New title added!");
-                } else if (_isEditMode == 3) {
-                  // Delete link
-                  codeProvider.deleteLink(widget.code, _editIndex);
-                  showToastMsg(context, "Entry deleted!");
                 } else {
                   // Add new link
                   codeProvider.addLink(widget.code, _linkController.text);
@@ -399,8 +454,11 @@ class _InnerPageState extends State<InnerPage>
           Positioned(
             top: 42,
             left: 26,
+            right: 80,
             child: Text(
-              head.length > 12 ? "${head.substring(0, 12)}..." : head,
+              head,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontFamily: 'Product',
                 fontWeight: FontWeight.w700,

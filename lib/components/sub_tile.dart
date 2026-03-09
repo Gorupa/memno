@@ -5,29 +5,45 @@ import 'package:memno/functionality/code_gen.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
-Widget subTile(BuildContext context, int code, String date, bool isLiked) {
-  int length = context.read<CodeGen>().getLinkListLength(code);
-  double radius = 50;
+class SubTile extends StatelessWidget {
+  final int code;
+  final String date;
+  final bool isLiked;
 
-  return Padding(
-    padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
-    child: SubTileStack(
+  const SubTile({
+    super.key,
+    required this.code,
+    required this.date,
+    required this.isLiked,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    int length = context.read<CodeGen>().getLinkListLength(code);
+    double radius = 50;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
+      child: SubTileStack(
         code: code,
         date: date,
         isLiked: isLiked,
         length: length,
-        radius: radius),
-  );
+        radius: radius,
+      ),
+    );
+  }
 }
 
 class SubTileStack extends StatefulWidget {
-  const SubTileStack(
-      {super.key,
-      required this.code,
-      required this.date,
-      required this.isLiked,
-      required this.length,
-      required this.radius});
+  const SubTileStack({
+    super.key,
+    required this.code,
+    required this.date,
+    required this.isLiked,
+    required this.length,
+    required this.radius,
+  });
 
   final int code;
   final String date;
@@ -47,9 +63,7 @@ class _SubTileStackState extends State<SubTileStack> {
     return Stack(
       children: [
         //Background Container
-        BgContainer(
-          radius: widget.radius,
-        ),
+        BgContainer(radius: widget.radius),
         if (!showDltConfirm) ...[
           //Code Text
           CodeText(code: widget.code),
@@ -99,8 +113,8 @@ class _SubTileStackState extends State<SubTileStack> {
               });
               showToastMsg(context, "Action cancelled");
             },
-          )
-        ]
+          ),
+        ],
       ],
     );
   }
@@ -129,10 +143,15 @@ class ShowDltPrompt extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("You sure you want to delete?\nCurrently contains $length items",
-              style: TextStyle(
-                  color: colors.textClr, fontSize: 16, fontFamily: 'Product'),
-              textAlign: TextAlign.center),
+          Text(
+            "You sure you want to delete?\nCurrently contains $length items",
+            style: TextStyle(
+              color: colors.textClr,
+              fontSize: 16,
+              fontFamily: 'Product',
+            ),
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -141,7 +160,7 @@ class ShowDltPrompt extends StatelessWidget {
               const SizedBox(width: 20),
               ContainerButton(onTap: onProceed, radius: radius, text: "Yes"),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -166,26 +185,24 @@ class ContainerButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-          width: 120,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: colors.pill,
-            borderRadius: BorderRadius.circular(radius),
-          ),
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: colors.textClr, fontFamily: 'Product'),
-          )),
+        width: 120,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: colors.pill,
+          borderRadius: BorderRadius.circular(radius),
+        ),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: colors.textClr, fontFamily: 'Product'),
+        ),
+      ),
     );
   }
 }
 
 class BgContainer extends StatelessWidget {
-  const BgContainer({
-    super.key,
-    required this.radius,
-  });
+  const BgContainer({super.key, required this.radius});
 
   final double radius;
 
@@ -204,10 +221,7 @@ class BgContainer extends StatelessWidget {
 }
 
 class CodeText extends StatelessWidget {
-  const CodeText({
-    super.key,
-    required this.code,
-  });
+  const CodeText({super.key, required this.code});
 
   final int code;
   @override
@@ -219,10 +233,11 @@ class CodeText extends StatelessWidget {
       child: SelectableText(
         "#$code",
         style: TextStyle(
-            color: colors.textClr,
-            fontSize: 26,
-            fontWeight: FontWeight.w400,
-            fontFamily: 'Product'),
+          color: colors.textClr,
+          fontSize: 26,
+          fontWeight: FontWeight.w400,
+          fontFamily: 'Product',
+        ),
         textAlign: TextAlign.center,
       ),
     );
@@ -230,10 +245,7 @@ class CodeText extends StatelessWidget {
 }
 
 class HeadText extends StatelessWidget {
-  const HeadText({
-    super.key,
-    required this.code,
-  });
+  const HeadText({super.key, required this.code});
 
   final int code;
 
@@ -242,17 +254,21 @@ class HeadText extends StatelessWidget {
     final colors = Provider.of<AppColors>(context);
     String head = Provider.of<CodeGen>(context).getHeadForCode(code);
     return Positioned(
-        bottom: 96,
-        left: 26,
-        child: Text(
-          head.length > 18 ? "${head.substring(0, 18)}..." : head,
-          style: TextStyle(
-              color: colors.textClr,
-              fontSize: 36,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'Product'),
-          textAlign: TextAlign.center,
-        ));
+      bottom: 96,
+      left: 26,
+      right: 160,
+      child: Text(
+        head,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: colors.textClr,
+          fontSize: 36,
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Product',
+        ),
+      ),
+    );
   }
 }
 
@@ -288,16 +304,16 @@ class LengthIndicator extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.arrow_outward_rounded,
-                  color: colors.iconClr, size: 14),
+              Icon(
+                Icons.arrow_outward_rounded,
+                color: colors.iconClr,
+                size: 14,
+              ),
               const Spacer(),
               Text(
                 length == 1 ? "$length  Entry" : "$length Entries",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Product',
-                  color: colors.textClr,
-                ),
+                style: TextStyle(fontFamily: 'Product', color: colors.textClr),
               ),
               const Spacer(),
             ],
@@ -309,10 +325,7 @@ class LengthIndicator extends StatelessWidget {
 }
 
 class DateTimeIndicator extends StatelessWidget {
-  const DateTimeIndicator({
-    super.key,
-    required this.date,
-  });
+  const DateTimeIndicator({super.key, required this.date});
 
   final String date;
 
@@ -320,34 +333,27 @@ class DateTimeIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
     return Positioned(
-        top: 28,
-        left: 26,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.calendar_month_outlined,
-              color: colors.iconClr,
-              size: 22,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              getFormattedDate(DateTime.parse(date)),
-              textAlign: TextAlign.center,
-              style: TextStyle(color: colors.textClr, fontFamily: 'Product'),
-            ),
-          ],
-        ));
+      top: 28,
+      left: 26,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(Icons.calendar_month_outlined, color: colors.iconClr, size: 22),
+          const SizedBox(width: 8),
+          Text(
+            getFormattedDate(DateTime.parse(date)),
+            textAlign: TextAlign.center,
+            style: TextStyle(color: colors.textClr, fontFamily: 'Product'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
 class LikeButton extends StatelessWidget {
-  const LikeButton({
-    super.key,
-    required this.code,
-    required this.isLiked,
-  });
+  const LikeButton({super.key, required this.code, required this.isLiked});
 
   final int code;
   final bool isLiked;
@@ -382,11 +388,7 @@ class LikeButton extends StatelessWidget {
 }
 
 class DltButton extends StatelessWidget {
-  const DltButton({
-    super.key,
-    required this.code,
-    required this.onPressed,
-  });
+  const DltButton({super.key, required this.code, required this.onPressed});
 
   final int code;
   final VoidCallback onPressed;
@@ -397,65 +399,13 @@ class DltButton extends StatelessWidget {
       right: 14,
       top: 16,
       child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colors.btnClr,
-            shape: const CircleBorder(),
-            padding: const EdgeInsets.all(16),
-          ),
-          onPressed: onPressed,
-          child: Icon(Icons.close_rounded, color: colors.btnIcon)),
-    );
-  }
-}
-
-class DeleteConfirmation extends StatelessWidget {
-  final VoidCallback onConfirm;
-  final VoidCallback onCancel;
-
-  const DeleteConfirmation(
-      {super.key, required this.onConfirm, required this.onCancel});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Provider.of<AppColors>(context);
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Are you sure you want to delete this item?',
-            style: TextStyle(
-                color: colors.textClr,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Product'),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: onCancel,
-                style: ElevatedButton.styleFrom(backgroundColor: colors.pill),
-                child: Text(
-                  'Cancel',
-                  style:
-                      TextStyle(color: colors.textClr, fontFamily: 'Product'),
-                ),
-              ),
-              const SizedBox(width: 20),
-              ElevatedButton(
-                onPressed: onConfirm,
-                style: ElevatedButton.styleFrom(backgroundColor: colors.pill),
-                child: Text(
-                  'Delete',
-                  style:
-                      TextStyle(color: colors.textClr, fontFamily: 'Product'),
-                ),
-              ),
-            ],
-          ),
-        ],
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colors.btnClr,
+          shape: const CircleBorder(),
+          padding: const EdgeInsets.all(16),
+        ),
+        onPressed: onPressed,
+        child: Icon(Icons.close_rounded, color: colors.btnIcon),
       ),
     );
   }
@@ -477,15 +427,12 @@ const List months = [
 ];
 
 String getFormattedDate(DateTime date) {
-  if (date.hour > 12) {
-    if (date.hour == 24) {
-      return "${date.day} ${months[date.month - 1]} ${date.year}, 12:${date.minute} pm";
-    }
-    return "${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour - 12}:${date.minute} pm";
-  } else {
-    if (date.hour == 0) {
-      return "${date.day} ${months[date.month - 1]} ${date.year}, 12:${date.minute} am";
-    }
-    return "${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour}:${date.minute} am";
-  }
+  final minute = date.minute.toString().padLeft(2, '0');
+  final suffix = date.hour >= 12 ? 'pm' : 'am';
+  final hour12 = date.hour == 0
+      ? 12
+      : date.hour > 12
+      ? date.hour - 12
+      : date.hour;
+  return "${date.day} ${months[date.month - 1]} ${date.year}, $hour12:$minute $suffix";
 }

@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
-import 'package:memno/components/custom_overlay.dart';
 import 'package:memno/components/inner_page.dart';
 import 'package:memno/components/settings_page.dart';
+import 'package:memno/components/share_target_page.dart';
 import 'package:memno/components/show_toast.dart';
 import 'package:memno/components/sub_tile.dart';
 import 'package:memno/functionality/code_gen.dart';
+import 'package:memno/main.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 enum Filters { all, liked, empty }
 
@@ -26,11 +28,58 @@ class _HomePageState extends State<HomePage> {
   String _searchedCode = '';
   bool isSearchBarVisible = false;
   Timer? _debounceTimer;
+  StreamSubscription? _shareSubscription;
 
   @override
   void initState() {
     super.initState();
     clearState();
+    _initShareIntent();
+  }
+
+  void _initShareIntent() {
+    // Handle shares received while app is running
+    _shareSubscription = ReceiveSharingIntent.instance.getMediaStream().listen((
+      List<SharedMediaFile> value,
+    ) {
+      if (value.isNotEmpty) {
+        final sharedText = value.first.path;
+        if (sharedText.isNotEmpty) {
+          _navigateToShareTarget(sharedText);
+        }
+      }
+    });
+
+    // Handle shares that launched the app (cold start)
+    ReceiveSharingIntent.instance.getInitialMedia().then((
+      List<SharedMediaFile> value,
+    ) {
+      if (value.isNotEmpty) {
+        final sharedText = value.first.path;
+        if (sharedText.isNotEmpty) {
+          _navigateToShareTarget(sharedText);
+        }
+      }
+    });
+  }
+
+  void _navigateToShareTarget(String sharedText) {
+    // Use the global navigatorKey so we can navigate even during init
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (context) => ShareTargetPage(sharedText: sharedText),
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _shareSubscription?.cancel();
+    _debounceTimer?.cancel();
+    _searchController.dispose();
+    super.dispose();
   }
 
   void switchSearchMode() {
@@ -186,7 +235,7 @@ class _HomePageState extends State<HomePage> {
                       final code = filteredList[index - 1];
                       final date = codeProvider.getDateForCode(code);
                       final isLiked = codeProvider.getLikeForCode(code);
-                      return subTile(context, code, date, isLiked);
+                      return SubTile(code: code, date: date, isLiked: isLiked);
                     }
                   },
                 );
@@ -270,12 +319,6 @@ class _HomePageState extends State<HomePage> {
               child: TextField(
                 controller: _searchController,
                 autofocus: true,
-                onTap: () {
-                  setState(() {
-                    _searchedCode = '';
-                    _searchController.clear();
-                  });
-                },
                 onChanged: _onSearch,
                 maxLines: 1,
                 style: TextStyle(color: colors.fgClr, fontFamily: 'Product'),
@@ -368,10 +411,8 @@ class CustomFAB extends StatelessWidget {
                   PageRouteBuilder(
                     transitionDuration: const Duration(milliseconds: 500),
                     pageBuilder: (context, animation, secondaryAnimation) {
-                      return CustomOverlay(
-                        child: InnerPage(
-                          code: context.read<CodeGen>().codeList.last,
-                        ),
+                      return InnerPage(
+                        code: context.read<CodeGen>().codeList.last,
                       );
                     },
                     transitionsBuilder:

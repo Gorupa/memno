@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:hive/hive.dart';
@@ -15,19 +18,23 @@ class PreviewMap extends ChangeNotifier {
     _init();
   }
 
+  /// Returns a Hive-safe key for the given link.
+  /// Hive string keys must be <= 255 chars; long URLs are SHA-256 hashed.
+  String _hiveKey(String link) {
+    if (link.length <= 255) return link;
+    return sha256.convert(utf8.encode(link)).toString();
+  }
+
   Future<void> _init() async {
     try {
       if (!Hive.isBoxOpen('previewsBox')) {
-        // Open the box if it is not already open
         _previewBox = await Hive.openBox<PreviewDataModel>('previewsBox');
       } else {
-        // Get the box if it is already open
         _previewBox = Hive.box<PreviewDataModel>('previewsBox');
       }
       _isInit = true;
     } catch (e, st) {
       debugPrint('PreviewMap init error: $e\n$st');
-      // Set _previewBox to null if initialization fails
       _previewBox = null;
     }
     notifyListeners();
@@ -46,7 +53,7 @@ class PreviewMap extends ChangeNotifier {
         imageHeight: data.image?.height,
         imageWidth: data.image?.width,
       );
-      await _previewBox!.put(link, model);
+      await _previewBox!.put(_hiveKey(link), model);
       cache[link] = data;
     } catch (e) {
       debugPrint('savePreview error: $e');
@@ -57,7 +64,7 @@ class PreviewMap extends ChangeNotifier {
   LinkPreviewData? loadPreviewSync(String link) {
     try {
       if (_previewBox != null && _previewBox!.isOpen) {
-        final model = _previewBox!.get(link);
+        final model = _previewBox!.get(_hiveKey(link));
         if (model == null) return null;
         final preview = LinkPreviewData(
           title: model.title,
@@ -87,7 +94,7 @@ class PreviewMap extends ChangeNotifier {
     try {
       if (!_isInit) await _init();
       if (_previewBox == null) return null;
-      final model = _previewBox!.get(link);
+      final model = _previewBox!.get(_hiveKey(link));
       if (model == null) return null;
       final preview = LinkPreviewData(
         title: model.title,

@@ -16,12 +16,13 @@ class InnerPageButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
     return ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colors.btnClr,
-          shape: const CircleBorder(),
-          padding: const EdgeInsets.all(16),
-        ),
-        onPressed: onPressed,
-        child: Icon(icon, color: colors.btnIcon));
+      style: ElevatedButton.styleFrom(
+        backgroundColor: colors.btnClr,
+        shape: const CircleBorder(),
+        padding: const EdgeInsets.all(16),
+      ),
+      onPressed: onPressed,
+      child: Icon(icon, color: colors.btnIcon),
+    );
   }
 }
