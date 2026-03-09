@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
-import 'package:memno/components/custom_overlay.dart';
 import 'package:memno/components/inner_page.dart';
 import 'package:memno/components/settings_page.dart';
 import 'package:memno/components/show_toast.dart';
@@ -186,7 +185,7 @@ class _HomePageState extends State<HomePage> {
                       final code = filteredList[index - 1];
                       final date = codeProvider.getDateForCode(code);
                       final isLiked = codeProvider.getLikeForCode(code);
-                      return subTile(context, code, date, isLiked);
+                      return SubTile(code: code, date: date, isLiked: isLiked);
                     }
                   },
                 );
@@ -270,12 +269,6 @@ class _HomePageState extends State<HomePage> {
               child: TextField(
                 controller: _searchController,
                 autofocus: true,
-                onTap: () {
-                  setState(() {
-                    _searchedCode = '';
-                    _searchController.clear();
-                  });
-                },
                 onChanged: _onSearch,
                 maxLines: 1,
                 style: TextStyle(color: colors.fgClr, fontFamily: 'Product'),
@@ -368,10 +361,8 @@ class CustomFAB extends StatelessWidget {
                   PageRouteBuilder(
                     transitionDuration: const Duration(milliseconds: 500),
                     pageBuilder: (context, animation, secondaryAnimation) {
-                      return CustomOverlay(
-                        child: InnerPage(
-                          code: context.read<CodeGen>().codeList.last,
-                        ),
+                      return InnerPage(
+                        code: context.read<CodeGen>().codeList.last,
                       );
                     },
                     transitionsBuilder:

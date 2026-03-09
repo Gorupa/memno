@@ -14,7 +14,6 @@ class ImportExport {
   // TODO: Add import and export functionality using JSON file
 
   late Box<CodeData>? _codeBox;
-  bool _isLoaded = false;
 
   ImportExport() {
     _loadCodeBox();
@@ -28,7 +27,6 @@ class ImportExport {
       } else {
         _codeBox = Hive.box<CodeData>('codeData');
       }
-      _isLoaded = true;
     } catch (e) {
       debugPrint('ImportExport _loadCodeBox error: $e');
     }
@@ -115,7 +113,13 @@ class ImportExport {
 
       // Decode JSON
       final bytes = result.files.first.bytes;
-      final jsonString = utf8.decode(bytes!);
+      if (bytes == null) {
+        if (context.mounted) {
+          showToastMsg(context, 'Could not read file data');
+        }
+        return;
+      }
+      final jsonString = utf8.decode(bytes);
       final json = jsonDecode(jsonString) as Map<String, dynamic>;
 
       // Get the notes

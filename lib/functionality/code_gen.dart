@@ -7,8 +7,6 @@ import 'package:memno/database/code_data.dart';
 class CodeGen extends ChangeNotifier {
   late Box<CodeData> _codeBox;
   bool _isReady = false;
-  final bool liked = false;
-  final String head = "Untitled";
 
   CodeGen() {
     init();
@@ -16,7 +14,6 @@ class CodeGen extends ChangeNotifier {
 
   //initializes hive
   Future<void> init() async {
-    Hive.registerAdapter(CodeDataAdapter());
     _codeBox = await Hive.openBox<CodeData>('codeData');
     _isReady = true;
     notifyListeners();
@@ -36,15 +33,19 @@ class CodeGen extends ChangeNotifier {
       code = 100000 + (rnd.nextInt(900000));
     } while (_codeBox.values.any((codeData) => codeData.code == code));
 
-    await _codeBox
-        .add(CodeData(code, [], DateTime.now().toString(), liked, head));
+    await _codeBox.add(
+      CodeData(code, [], DateTime.now().toString(), false, "Untitled"),
+    );
     notifyListeners();
   }
 
   //deletes a specific code
   Future<void> clearList(int code) async {
-    var key =
-        _codeBox.keys.firstWhere((key) => _codeBox.get(key)!.code == code);
+    final key = _codeBox.keys.cast<dynamic>().firstWhere(
+      (key) => _codeBox.get(key)?.code == code,
+      orElse: () => null,
+    );
+    if (key == null) return;
     await _codeBox.delete(key);
     notifyListeners();
   }
@@ -82,9 +83,10 @@ class CodeGen extends ChangeNotifier {
 
   //toggle like
   Future<void> toggleLike(int code) async {
-    final codeData =
-        _codeBox.values.firstWhere((codeData) => codeData.code == code);
-    //orElse: () => CodeData(code, [], date, liked, head));
+    final codeData = _codeBox.values
+        .where((codeData) => codeData.code == code)
+        .firstOrNull;
+    if (codeData == null) return;
     codeData.liked = !codeData.liked;
     await codeData.save();
     notifyListeners();
@@ -103,9 +105,10 @@ class CodeGen extends ChangeNotifier {
 
   //Add heading text
   Future<void> addHead(int code, String head) async {
-    final codeData =
-        _codeBox.values.firstWhere((codeData) => codeData.code == code);
-    //orElse: () => CodeData(code, [], date, liked, head));
+    final codeData = _codeBox.values
+        .where((codeData) => codeData.code == code)
+        .firstOrNull;
+    if (codeData == null) return;
     codeData.head = head;
     await codeData.save();
     notifyListeners();
@@ -123,9 +126,10 @@ class CodeGen extends ChangeNotifier {
 
   //Add link to a specific code
   Future<void> addLink(int code, String link) async {
-    final codeData =
-        _codeBox.values.firstWhere((codeData) => codeData.code == code);
-    //orElse: () => CodeData(code, [], date, liked, head));
+    final codeData = _codeBox.values
+        .where((codeData) => codeData.code == code)
+        .firstOrNull;
+    if (codeData == null) return;
     codeData.links.add(link);
     await codeData.save();
     notifyListeners();
@@ -133,9 +137,10 @@ class CodeGen extends ChangeNotifier {
 
   //Edit links within a specific code
   Future<void> editLink(int code, int index, String newLink) async {
-    final codeData =
-        _codeBox.values.firstWhere((codeData) => codeData.code == code);
-    //orElse: () => CodeData(code, [], date, liked, head));
+    final codeData = _codeBox.values
+        .where((codeData) => codeData.code == code)
+        .firstOrNull;
+    if (codeData == null) return;
     if (codeData.links.length > index) {
       codeData.links[index] = newLink;
       await codeData.save();
@@ -145,12 +150,13 @@ class CodeGen extends ChangeNotifier {
 
   //Delete link within a specific code
   Future<void> deleteLink(int code, int index) async {
-    final codeData =
-        _codeBox.values.firstWhere((codeData) => codeData.code == code);
-    //orElse: () => CodeData(code, [], date, liked, head));
+    final codeData = _codeBox.values
+        .where((codeData) => codeData.code == code)
+        .firstOrNull;
+    if (codeData == null) return;
     if (codeData.links.length > index) {
       codeData.links.removeAt(index);
-      codeData.save();
+      await codeData.save();
       notifyListeners();
     }
   }
