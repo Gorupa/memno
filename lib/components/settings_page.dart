@@ -197,10 +197,12 @@ class SettingsPage extends StatelessWidget {
                   final latestVer = release['tag_name'].toString().split(
                     '+',
                   )[0]; // Obtain latest version on GitHub
-                  final browserUrl =
-                      release['assets'][0]['browser_download_url']
-                          as String; // Obtain download link for the latest version
-                  if (browserUrl.isEmpty || latestVer.isEmpty) {
+                  final browserUrl = getDownloadUrlForDevice(
+                    release,
+                  ); // Obtain arch-appropriate download link
+                  if (browserUrl == null ||
+                      browserUrl.isEmpty ||
+                      latestVer.isEmpty) {
                     _showDialog(
                       context,
                       "Update Check Failed",
