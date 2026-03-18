@@ -244,136 +244,133 @@ class _InnerPageState extends State<InnerPage>
                               // Button bar (copy, edit, delete)
                               Positioned(
                                 top: 10,
+                                left: 20,
                                 right: 20,
                                 child: SizedBox(
-                                  width: 200,
                                   height: 80,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // Copy Button
-                                      InnerPageButton(
-                                        onPressed: () {
-                                          showToastMsg(context, "Item copied!");
-                                          Clipboard.setData(
-                                            ClipboardData(
-                                              text: links[index - 1],
-                                            ),
-                                          );
-                                        },
-                                        icon: Icons.copy_rounded,
-                                      ),
-                                      const Spacer(),
-                                      // Edit Button
-                                      InnerPageButton(
-                                        icon: Icons.mode_edit_outline_rounded,
-                                        onPressed: () {
-                                          setState(() {
-                                            _isEditMode = 1;
-                                            _editIndex = index - 1;
-                                            _linkController.text =
-                                                links[index - 1];
-                                          });
-                                          FocusScope.of(
-                                            context,
-                                          ).requestFocus(_fabFocus);
-                                        },
-                                      ),
-                                      const Spacer(),
-                                      // Delete Button
-                                      InnerPageButton(
-                                        icon: Icons.delete_rounded,
-                                        onPressed: () {
-                                          final colors = Provider.of<AppColors>(
-                                            context,
-                                            listen: false,
-                                          );
-                                          showDialog(
-                                            context: context,
-                                            builder: (dialogContext) => AlertDialog(
-                                              backgroundColor: colors.box,
-                                              title: Text(
-                                                "Delete Entry",
-                                                style: TextStyle(
-                                                  fontFamily: 'Product',
-                                                  color: colors.textClr,
-                                                ),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    physics: const BouncingScrollPhysics(),
+                                    child: Row(
+                                      children: [
+                                        // Index Badge (Unified Style)
+                                        InnerPageButton(
+                                          icon: Icons.tag_rounded,
+                                          label: index.toString(),
+                                          onPressed: () {},
+                                          backgroundColor: Colors.black,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        // Copy Button
+                                        InnerPageButton(
+                                          label: "Copy",
+                                          onPressed: () {
+                                            showToastMsg(
+                                              context,
+                                              "Item copied!",
+                                            );
+                                            Clipboard.setData(
+                                              ClipboardData(
+                                                text: links[index - 1],
                                               ),
-                                              content: Text(
-                                                "Do you want to delete entry no.$index? This is irreversible.",
-                                                style: TextStyle(
-                                                  fontFamily: 'Product',
-                                                  color: colors.textClr,
-                                                ),
-                                              ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                        dialogContext,
+                                            );
+                                          },
+                                          icon: Icons.copy_rounded,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        // Edit Button
+                                        InnerPageButton(
+                                          label: "Edit",
+                                          icon: Icons.mode_edit_outline_rounded,
+                                          onPressed: () {
+                                            setState(() {
+                                              _isEditMode = 1;
+                                              _editIndex = index - 1;
+                                              _linkController.text =
+                                                  links[index - 1];
+                                            });
+                                            FocusScope.of(
+                                              context,
+                                            ).requestFocus(_fabFocus);
+                                          },
+                                        ),
+                                        const SizedBox(width: 12),
+                                        // Delete Button
+                                        InnerPageButton(
+                                          label: "Delete",
+                                          icon: Icons.delete_rounded,
+                                          onPressed: () {
+                                            final colors =
+                                                Provider.of<AppColors>(
+                                                  context,
+                                                  listen: false,
+                                                );
+                                            showDialog(
+                                              context: context,
+                                              builder: (dialogContext) =>
+                                                  AlertDialog(
+                                                    backgroundColor: colors.box,
+                                                    title: Text(
+                                                      "Delete Entry",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Product',
+                                                        color: colors.textClr,
                                                       ),
-                                                  child: Text(
-                                                    "Cancel",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Product',
-                                                      color: colors.textClr,
                                                     ),
-                                                  ),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(
-                                                      dialogContext,
-                                                    );
-                                                    context
-                                                        .read<CodeGen>()
-                                                        .deleteLink(
-                                                          widget.code,
-                                                          index - 1,
-                                                        );
-                                                    showToastMsg(
-                                                      context,
-                                                      "Entry deleted!",
-                                                    );
-                                                  },
-                                                  child: Text(
-                                                    "Delete",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Product',
-                                                      color: Colors.red,
+                                                    content: Text(
+                                                      "Do you want to delete entry no.$index? This is irreversible.",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Product',
+                                                        color: colors.textClr,
+                                                      ),
                                                     ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                              dialogContext,
+                                                            ),
+                                                        child: Text(
+                                                          "Cancel",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Product',
+                                                            color:
+                                                                colors.textClr,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                            dialogContext,
+                                                          );
+                                                          context
+                                                              .read<CodeGen>()
+                                                              .deleteLink(
+                                                                widget.code,
+                                                                index - 1,
+                                                              );
+                                                          showToastMsg(
+                                                            context,
+                                                            "Entry deleted!",
+                                                          );
+                                                        },
+                                                        child: Text(
+                                                          "Delete",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Product',
+                                                            color: Colors.red,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              // Index badge
-                              Positioned(
-                                top: 22,
-                                left: 22,
-                                child: Container(
-                                  height: 58,
-                                  width: 78,
-                                  decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(50),
-                                    ),
-                                    color: Colors.black,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      index.toString(),
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.white,
-                                        fontFamily: 'Product',
-                                      ),
+                                            );
+                                          },
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),

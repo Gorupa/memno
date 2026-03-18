@@ -7,22 +7,47 @@ class InnerPageButton extends StatelessWidget {
     super.key,
     required this.icon,
     required this.onPressed,
+    this.label,
+    this.backgroundColor,
   });
 
   final IconData icon;
   final VoidCallback onPressed;
+  final String? label;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: colors.btnClr,
-        shape: const CircleBorder(),
-        padding: const EdgeInsets.all(16),
+        backgroundColor: backgroundColor ?? colors.btnClr,
+        foregroundColor: colors.btnIcon,
+        shape: const StadiumBorder(),
+        padding: EdgeInsets.symmetric(
+          horizontal: label != null ? 16 : 14,
+          vertical: 12,
+        ),
+        elevation: 0,
       ),
       onPressed: onPressed,
-      child: Icon(icon, color: colors.btnIcon),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: colors.btnIcon, size: 20),
+          if (label != null) ...[
+            const SizedBox(width: 8),
+            Text(
+              label!,
+              style: const TextStyle(
+                fontFamily: 'Product',
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
