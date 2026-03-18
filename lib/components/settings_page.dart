@@ -68,27 +68,24 @@ class SettingsPage extends StatelessWidget {
           children: [
             settingsTitle("Settings", colors),
             settingsContainer(
-              SwitchListTile(
-                trackColor: WidgetStateProperty.all(
-                  colors.accnt.withValues(alpha: 0.3),
-                ),
-                overlayColor: WidgetStateProperty.all(colors.accnt),
-                thumbColor: WidgetStateProperty.all(colors.thumbClr),
-                trackOutlineColor: WidgetStateProperty.all(
-                  colors.switchTrackOutlineClr,
-                ),
+              ListTile(
+                onTap: () => colors.cycleThemeMode(),
                 title: Text(
-                  "Dark Mode",
+                  "Appearance",
                   style: TextStyle(
                     fontFamily: 'Product',
                     fontSize: 18,
                     color: colors.textClr,
                   ),
                 ),
-                value: context.watch<AppColors>().isDarkMode,
-                onChanged: (_) async {
-                  await colors.toggleTheme();
-                },
+                trailing: Icon(
+                  colors.themeMode == AppThemeMode.system
+                      ? Icons.brightness_auto_rounded
+                      : colors.themeMode == AppThemeMode.light
+                      ? Icons.light_mode_rounded
+                      : Icons.dark_mode_rounded,
+                  color: colors.textClr,
+                ),
               ),
               colors,
             ),
@@ -299,7 +296,7 @@ class SettingsPage extends StatelessWidget {
   Container settingsContainer(Widget child, AppColors colors) {
     return Container(
       height: 100,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       margin: const EdgeInsets.fromLTRB(2, 4, 2, 4),
       alignment: Alignment.center,
       decoration: BoxDecoration(

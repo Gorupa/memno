@@ -4,15 +4,31 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:memno/database/toggles_data.dart';
 
-class AppColors extends ChangeNotifier {
+enum AppThemeMode { system, light, dark }
+
+class AppColors extends ChangeNotifier with WidgetsBindingObserver {
   late Box<TogglesData> _togglesBox;
-  // Check if system is in dark mode
-  bool _isDarkMode =
-      PlatformDispatcher.instance.platformBrightness == Brightness.dark;
+
+  AppThemeMode _currentThemeMode = AppThemeMode.system;
   bool _isCompactHeader = false;
 
   AppColors() {
     init();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    if (_currentThemeMode == AppThemeMode.system) {
+      notifyListeners();
+    }
+    super.didChangePlatformBrightness();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   Future<void> init() async {
@@ -21,62 +37,92 @@ class AppColors extends ChangeNotifier {
     TogglesData? togglesData = _togglesBox.get(0);
 
     if (togglesData == null) {
+      // Default to system
+      _currentThemeMode = AppThemeMode.system;
       await _togglesBox.put(
         0,
-        TogglesData(darkMode: _isDarkMode, compactHeader: _isCompactHeader),
+        TogglesData(
+          darkMode: false,
+          compactHeader: _isCompactHeader,
+          themeMode: 0,
+        ),
       );
     } else {
-      _isDarkMode = togglesData.darkMode;
       _isCompactHeader = togglesData.compactHeader;
+
+      // Migration and Load logic
+      if (togglesData.themeMode != null) {
+        _currentThemeMode = AppThemeMode.values[togglesData.themeMode!];
+      } else {
+        // Migrate from old darkMode boolean
+        _currentThemeMode = togglesData.darkMode
+            ? AppThemeMode.dark
+            : AppThemeMode.light;
+
+        // Save the migrated value
+        togglesData.themeMode = _currentThemeMode.index;
+        await togglesData.save();
+      }
     }
     notifyListeners();
   }
 
-  bool get isDarkMode => _isDarkMode;
+  AppThemeMode get themeMode => _currentThemeMode;
+  bool get isDarkMode {
+    if (_currentThemeMode == AppThemeMode.system) {
+      return PlatformDispatcher.instance.platformBrightness == Brightness.dark;
+    }
+    return _currentThemeMode == AppThemeMode.dark;
+  }
+
   bool get isCompactHeader => _isCompactHeader;
 
   final _light = LightColors();
   final _dark = DarkColors();
 
-  // Toggle dark mode and save it to the togglesData box
-  Future<void> toggleTheme() async {
-    _isDarkMode = !_isDarkMode;
-    TogglesData togglesData = TogglesData(
-      darkMode: _isDarkMode,
-      compactHeader: _isCompactHeader,
-    );
-    await _togglesBox.put(0, togglesData);
+  Future<void> setThemeMode(AppThemeMode mode) async {
+    _currentThemeMode = mode;
+    TogglesData? togglesData = _togglesBox.get(0);
+    if (togglesData != null) {
+      togglesData.themeMode = mode.index;
+      await togglesData.save();
+    }
     notifyListeners();
   }
 
-  // Toggle compact header and save it to the togglesData box
+  Future<void> cycleThemeMode() async {
+    final nextIndex =
+        (_currentThemeMode.index + 1) % AppThemeMode.values.length;
+    await setThemeMode(AppThemeMode.values[nextIndex]);
+  }
+
   Future<void> toggleCompactHeader() async {
     _isCompactHeader = !_isCompactHeader;
-    TogglesData togglesData = TogglesData(
-      darkMode: _isDarkMode,
-      compactHeader: _isCompactHeader,
-    );
-    await _togglesBox.put(0, togglesData);
+    TogglesData? togglesData = _togglesBox.get(0);
+    if (togglesData != null) {
+      togglesData.compactHeader = _isCompactHeader;
+      await togglesData.save();
+    }
     notifyListeners();
   }
 
-  Color get bgClr => _isDarkMode ? _dark.bgClr : _light.bgClr;
-  Color get fgClr => _isDarkMode ? _dark.fgClr : _light.fgClr;
-  Color get box => _isDarkMode ? _dark.box : _light.box;
-  Color get search => _isDarkMode ? _dark.search : _light.search;
-  Color get accnt => _isDarkMode ? _dark.accnt : _light.accnt;
-  Color get accntPill => _isDarkMode ? _dark.accntPill : _light.accntPill;
-  Color get accntText => _isDarkMode ? _dark.accntText : _light.accntText;
-  Color get textClr => _isDarkMode ? _dark.textClr : _light.textClr;
-  Color get iconClr => _isDarkMode ? _dark.iconClr : _light.iconClr;
-  Color get btnClr => _isDarkMode ? _dark.btnClr : _light.btnClr;
-  Color get btnIcon => _isDarkMode ? _dark.btnIcon : _light.btnIcon;
-  Color get pill => _isDarkMode ? _dark.pill : _light.pill;
-  Color get toastBg => _isDarkMode ? _dark.toastBg : _light.toastBg;
-  Color get toastText => _isDarkMode ? _dark.toastText : _light.toastText;
-  Color get thumbClr => _isDarkMode ? _dark.thumbClr : _light.thumbClr;
+  Color get bgClr => isDarkMode ? _dark.bgClr : _light.bgClr;
+  Color get fgClr => isDarkMode ? _dark.fgClr : _light.fgClr;
+  Color get box => isDarkMode ? _dark.box : _light.box;
+  Color get search => isDarkMode ? _dark.search : _light.search;
+  Color get accnt => isDarkMode ? _dark.accnt : _light.accnt;
+  Color get accntPill => isDarkMode ? _dark.accntPill : _light.accntPill;
+  Color get accntText => isDarkMode ? _dark.accntText : _light.accntText;
+  Color get textClr => isDarkMode ? _dark.textClr : _light.textClr;
+  Color get iconClr => isDarkMode ? _dark.iconClr : _light.iconClr;
+  Color get btnClr => isDarkMode ? _dark.btnClr : _light.btnClr;
+  Color get btnIcon => isDarkMode ? _dark.btnIcon : _light.btnIcon;
+  Color get pill => isDarkMode ? _dark.pill : _light.pill;
+  Color get toastBg => isDarkMode ? _dark.toastBg : _light.toastBg;
+  Color get toastText => isDarkMode ? _dark.toastText : _light.toastText;
+  Color get thumbClr => isDarkMode ? _dark.thumbClr : _light.thumbClr;
   Color get switchTrackOutlineClr =>
-      _isDarkMode ? _dark.switchTrackOutlineClr : _light.switchTrackOutlineClr;
+      isDarkMode ? _dark.switchTrackOutlineClr : _light.switchTrackOutlineClr;
 }
 
 class LightColors {

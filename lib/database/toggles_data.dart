@@ -10,5 +10,12 @@ class TogglesData extends HiveObject {
   @HiveField(1)
   bool compactHeader;
 
-  TogglesData({this.darkMode = false, this.compactHeader = false});
+  @HiveField(2)
+  int? themeMode;
+
+  TogglesData({
+    this.darkMode = false,
+    this.compactHeader = false,
+    this.themeMode,
+  });
 }
