@@ -20,19 +20,22 @@ class TogglesDataAdapter extends TypeAdapter<TogglesData> {
       darkMode: fields[0] as bool,
       compactHeader: fields[1] as bool,
       themeMode: fields[2] as int?,
+      saveImagesLocally: fields[3] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, TogglesData obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.darkMode)
       ..writeByte(1)
       ..write(obj.compactHeader)
       ..writeByte(2)
-      ..write(obj.themeMode);
+      ..write(obj.themeMode)
+      ..writeByte(3)
+      ..write(obj.saveImagesLocally);
   }
 
   @override

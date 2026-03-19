@@ -13,9 +13,13 @@ class TogglesData extends HiveObject {
   @HiveField(2)
   int? themeMode;
 
+  @HiveField(3)
+  bool saveImagesLocally;
+
   TogglesData({
     this.darkMode = false,
     this.compactHeader = false,
     this.themeMode,
+    this.saveImagesLocally = true,
   });
 }

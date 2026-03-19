@@ -22,6 +22,9 @@ class PreviewDataModel {
   @HiveField(5)
   final String? link;
 
+  @HiveField(6)
+  final String? localImagePath;
+
   PreviewDataModel({
     this.title,
     this.description,
@@ -29,5 +32,6 @@ class PreviewDataModel {
     this.imageHeight,
     this.imageWidth,
     this.link,
+    this.localImagePath,
   });
 }

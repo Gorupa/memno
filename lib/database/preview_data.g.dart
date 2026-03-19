@@ -23,13 +23,14 @@ class PreviewDataModelAdapter extends TypeAdapter<PreviewDataModel> {
       imageHeight: fields[3] as double?,
       imageWidth: fields[4] as double?,
       link: fields[5] as String?,
+      localImagePath: fields[6] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PreviewDataModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class PreviewDataModelAdapter extends TypeAdapter<PreviewDataModel> {
       ..writeByte(4)
       ..write(obj.imageWidth)
       ..writeByte(5)
-      ..write(obj.link);
+      ..write(obj.link)
+      ..writeByte(6)
+      ..write(obj.localImagePath);
   }
 
   @override

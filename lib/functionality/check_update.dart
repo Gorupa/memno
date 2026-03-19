@@ -105,11 +105,7 @@ bool isNewerVersion(String latest, String current, String buildNumber) {
 /// Returns a Stream of OtaEvent containing the download progress and status.
 Stream<OtaEvent> startOtaUpdate(String url) {
   try {
-    return OtaUpdate().execute(
-      url,
-      // Optional: you can provide checksum if needed
-      // destinationName: 'memno.apk',
-    );
+    return OtaUpdate().execute(url);
   } catch (e) {
     rethrow;
   }
