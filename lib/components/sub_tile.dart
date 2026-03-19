@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:memno/components/inner_page.dart';
 import 'package:memno/components/show_toast.dart';
@@ -115,19 +116,24 @@ class _SubTileStackState extends State<SubTileStack> {
                         children: [
                           Expanded(child: CodeText(code: widget.code)),
                           const SizedBox(width: 8),
-                          LengthIndicator(
-                            radius: radius,
-                            length: length,
-                            code: widget.code,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      InnerPage(code: widget.code),
+                          OpenContainer(
+                            transitionType: ContainerTransitionType.fade,
+                            openBuilder: (context, _) =>
+                                InnerPage(code: widget.code),
+                            closedElevation: 0,
+                            closedColor: Colors.transparent,
+                            openColor: colors.bgClr,
+                            middleColor: colors.bgClr,
+                            closedShape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(radius),
+                            ),
+                            closedBuilder: (context, openContainer) =>
+                                LengthIndicator(
+                                  radius: radius,
+                                  length: length,
+                                  code: widget.code,
+                                  onTap: openContainer,
                                 ),
-                              );
-                            },
                           ),
                         ],
                       ),

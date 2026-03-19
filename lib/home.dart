@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:memno/components/inner_page.dart';
@@ -203,12 +204,19 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: colors.bgClr,
         foregroundColor: colors.fgClr,
         surfaceTintColor: colors.bgClr,
-        leading: IconButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SettingsPage()),
+        // Settings button
+        // Show the animation to the settings page
+        leading: OpenContainer(
+          transitionType: ContainerTransitionType.fade,
+          openBuilder: (context, _) => const SettingsPage(),
+          closedElevation: 0,
+          closedColor: Colors.transparent,
+          openColor: colors.bgClr,
+          middleColor: colors.bgClr,
+          closedBuilder: (context, openContainer) => IconButton(
+            onPressed: openContainer,
+            icon: const Icon(Icons.menu_rounded),
           ),
-          icon: const Icon(Icons.menu_rounded),
         ),
       ),
       body: Consumer<CodeGen>(
@@ -393,9 +401,20 @@ class CustomFAB extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: 'fab_to_page',
-      child: GlassmorphicContainer(
+    final colors = Provider.of<AppColors>(context);
+
+    return OpenContainer(
+      transitionType: ContainerTransitionType.fade,
+      openBuilder: (context, _) =>
+          InnerPage(code: context.read<CodeGen>().codeList.last),
+      closedElevation: 0,
+      closedShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radius + 10),
+      ),
+      closedColor: Colors.transparent,
+      openColor: colors.bgClr,
+      middleColor: colors.bgClr,
+      closedBuilder: (context, openContainer) => GlassmorphicContainer(
         width: width,
         height: height,
         alignment: Alignment.center,
@@ -432,29 +451,7 @@ class CustomFAB extends StatelessWidget {
               ),
               onPressed: () {
                 context.read<CodeGen>().generateCode();
-
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    transitionDuration: const Duration(milliseconds: 500),
-                    pageBuilder: (context, animation, secondaryAnimation) {
-                      return InnerPage(
-                        code: context.read<CodeGen>().codeList.last,
-                      );
-                    },
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                          return ScaleTransition(
-                            scale: Tween<double>(begin: 0.0, end: 1.0).animate(
-                              CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.fastLinearToSlowEaseIn,
-                              ),
-                            ),
-                            child: child,
-                          );
-                        },
-                  ),
-                );
+                openContainer();
               },
               child: const Icon(Icons.add_rounded, size: 30),
             ),

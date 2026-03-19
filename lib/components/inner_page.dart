@@ -36,14 +36,8 @@ class _InnerPageState extends State<InnerPage>
     final colors = Provider.of<AppColors>(context);
     final codeProvider = Provider.of<CodeGen>(context);
 
-    return Hero(
-      tag: 'fab_to_page',
-      transitionOnUserGestures: true,
-      child: Material(
-        type: MaterialType.canvas,
-        color: colors.bgClr,
-        child: Scaffold(
-          backgroundColor: colors.bgClr,
+    return Scaffold(
+      backgroundColor: colors.bgClr,
           appBar: AppBar(
             backgroundColor: colors.bgClr,
             foregroundColor: colors.fgClr,
@@ -461,9 +455,7 @@ class _InnerPageState extends State<InnerPage>
           ),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
-        ),
-      ),
-    );
+        );
   }
 
   /// Top bar widget showing the title and edit button
