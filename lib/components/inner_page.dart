@@ -9,6 +9,7 @@ import 'package:memno/functionality/code_gen.dart';
 import 'package:memno/functionality/preview_map.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Main page widget for displaying and editing a list of links and a title.
@@ -252,6 +253,7 @@ class _InnerPageState extends State<InnerPage>
                                     scrollDirection: Axis.horizontal,
                                     physics: const BouncingScrollPhysics(),
                                     child: Row(
+                                      spacing: 8,
                                       children: [
                                         // Index Badge (Unified Style)
                                         InnerPageButton(
@@ -260,7 +262,23 @@ class _InnerPageState extends State<InnerPage>
                                           onPressed: () {},
                                           backgroundColor: Colors.black,
                                         ),
-                                        const SizedBox(width: 12),
+
+                                        // Edit Button
+                                        InnerPageButton(
+                                          label: "Edit",
+                                          icon: Icons.edit_note_rounded,
+                                          onPressed: () {
+                                            setState(() {
+                                              _isEditMode = 1;
+                                              _editIndex = index - 1;
+                                              _linkController.text =
+                                                  links[index - 1];
+                                            });
+                                            FocusScope.of(
+                                              context,
+                                            ).requestFocus(_fabFocus);
+                                          },
+                                        ),
                                         // Copy Button
                                         InnerPageButton(
                                           label: "Copy",
@@ -277,28 +295,23 @@ class _InnerPageState extends State<InnerPage>
                                           },
                                           icon: Icons.copy_rounded,
                                         ),
-                                        const SizedBox(width: 12),
-                                        // Edit Button
+                                        // Share Button
                                         InnerPageButton(
-                                          label: "Edit",
-                                          icon: Icons.mode_edit_outline_rounded,
+                                          label: "Share",
                                           onPressed: () {
-                                            setState(() {
-                                              _isEditMode = 1;
-                                              _editIndex = index - 1;
-                                              _linkController.text =
-                                                  links[index - 1];
-                                            });
-                                            FocusScope.of(
-                                              context,
-                                            ).requestFocus(_fabFocus);
+                                            SharePlus.instance.share(
+                                              ShareParams(
+                                                text: links[index - 1],
+                                              ),
+                                            );
                                           },
+                                          icon: Icons.share_outlined,
                                         ),
-                                        const SizedBox(width: 12),
+
                                         // Delete Button
                                         InnerPageButton(
                                           label: "Delete",
-                                          icon: Icons.delete_rounded,
+                                          icon: Icons.delete_outline_rounded,
                                           onPressed: () {
                                             final colors =
                                                 Provider.of<AppColors>(
