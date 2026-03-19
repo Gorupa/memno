@@ -34,6 +34,7 @@
     <img src="assets/screenshots/home.png" width="250" style="padding-right: 10px; padding-bottom: 10px;"/>
     <img src="assets/screenshots/preview.png" width="250" style="padding-right: 10px;padding-bottom: 10px;"/>
     <img src="assets/screenshots/add_link.png" width="250" style="padding-bottom: 10px;"/>
+    <img src="assets/screenshots/update.jpeg" width="250" style="padding-bottom: 10px;"/>
 </p>
 
 ---
