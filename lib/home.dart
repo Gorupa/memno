@@ -235,7 +235,11 @@ class _HomePageState extends State<HomePage> {
                       final code = filteredList[index - 1];
                       final date = codeProvider.getDateForCode(code);
                       final isLiked = codeProvider.getLikeForCode(code);
-                      return SubTile(code: code, date: date, isLiked: isLiked);
+                      return SubTileStack(
+                        code: code,
+                        date: date,
+                        isLiked: isLiked,
+                      );
                     }
                   },
                 );

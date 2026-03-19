@@ -24,10 +24,7 @@ class InnerPageButton extends StatelessWidget {
         backgroundColor: backgroundColor ?? colors.btnClr,
         foregroundColor: colors.btnIcon,
         shape: const StadiumBorder(),
-        padding: EdgeInsets.symmetric(
-          horizontal: label != null ? 16 : 14,
-          vertical: 12,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         elevation: 0,
       ),
       onPressed: onPressed,

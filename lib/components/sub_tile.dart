@@ -7,51 +7,17 @@ import 'package:provider/provider.dart';
 
 import 'package:memno/components/inner_page_fun.dart';
 
-class SubTile extends StatelessWidget {
-  final int code;
-  final String date;
-  final bool isLiked;
-
-  const SubTile({
-    super.key,
-    required this.code,
-    required this.date,
-    required this.isLiked,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    int length = context.read<CodeGen>().getLinkListLength(code);
-    double radius = 50;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
-      child: SubTileStack(
-        code: code,
-        date: date,
-        isLiked: isLiked,
-        length: length,
-        radius: radius,
-      ),
-    );
-  }
-}
-
 class SubTileStack extends StatefulWidget {
   const SubTileStack({
     super.key,
     required this.code,
     required this.date,
     required this.isLiked,
-    required this.length,
-    required this.radius,
   });
 
   final int code;
   final String date;
   final bool isLiked;
-  final int length;
-  final double radius;
 
   @override
   State<SubTileStack> createState() => _SubTileStackState();
@@ -62,105 +28,128 @@ class _SubTileStackState extends State<SubTileStack> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        //Background Container
-        BgContainer(radius: widget.radius),
-        if (!showDltConfirm) ...[
-          //Code Text
-          CodeText(code: widget.code),
-          //Head Text
-          HeadText(code: widget.code),
-          //Length indicator
-          LengthIndicator(
-            radius: widget.radius,
-            length: widget.length,
-            code: widget.code,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => InnerPage(code: widget.code),
-                ),
-              );
-            },
-          ),
-          // Action Bar (Date, Like, Delete)
-          Positioned(
-            top: 12,
-            left: 14,
-            right: 14,
-            child: SizedBox(
-              height: 65,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Row(
-                  spacing: 8,
+    int length = context.read<CodeGen>().getLinkListLength(widget.code);
+    double radius = 50;
+    final colors = Provider.of<AppColors>(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: colors.box,
+          borderRadius: BorderRadius.circular(radius),
+        ),
+        child: !showDltConfirm
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(radius),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 24,
                   children: [
-                    // Date Display (Unified Style)
-                    InnerPageButton(
-                      icon: Icons.calendar_month_outlined,
-                      label: getFormattedDate(DateTime.parse(widget.date)),
-                      onPressed: () {},
+                    // Row 1: Action Bar (Date, Like, Delete)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Row(
+                          spacing: 8,
+                          children: [
+                            const SizedBox(width: 12),
+                            // Date Display
+                            InnerPageButton(
+                              icon: Icons.calendar_month_outlined,
+                              label: getFormattedDate(
+                                DateTime.parse(widget.date),
+                              ),
+                              onPressed: () {},
+                            ),
+                            // Like Button
+                            InnerPageButton(
+                              key: ValueKey(widget.code),
+                              icon: widget.isLiked
+                                  ? Icons.favorite_rounded
+                                  : Icons.favorite_border_rounded,
+                              label: widget.isLiked ? "Liked" : "Like",
+                              onPressed: () {
+                                context.read<CodeGen>().toggleLike(widget.code);
+                                if (widget.isLiked) {
+                                  showToastMsg(
+                                    context,
+                                    "#${widget.code} removed from favorites",
+                                  );
+                                } else {
+                                  showToastMsg(
+                                    context,
+                                    "#${widget.code} added to favorites",
+                                  );
+                                }
+                              },
+                            ),
+                            // Delete Button
+                            InnerPageButton(
+                              icon: Icons.delete_outline_rounded,
+                              label: "Delete",
+                              onPressed: () {
+                                setState(() {
+                                  showDltConfirm = true;
+                                });
+                              },
+                            ),
+                            const SizedBox(width: 26),
+                          ],
+                        ),
+                      ),
                     ),
-                    // Like Button
-                    InnerPageButton(
-                      key: ValueKey(widget.code),
-                      icon: widget.isLiked
-                          ? Icons.favorite_rounded
-                          : Icons.favorite_border_rounded,
-                      label: widget.isLiked ? "Liked" : "Like",
-                      onPressed: () {
-                        context.read<CodeGen>().toggleLike(widget.code);
-                        if (widget.isLiked) {
-                          showToastMsg(
-                            context,
-                            "#${widget.code} removed from favorites",
-                          );
-                        } else {
-                          showToastMsg(
-                            context,
-                            "#${widget.code} added to favorites",
-                          );
-                        }
-                      },
-                    ),
-                    // Delete Button
-                    InnerPageButton(
-                      icon: Icons.delete_outline_rounded,
-                      label: "Delete",
-                      onPressed: () {
-                        setState(() {
-                          showDltConfirm = true;
-                        });
-                      },
+                    // Row 2: HeadText
+                    HeadText(code: widget.code),
+                    // Row 3: CodeText and LengthIndicator
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 16, 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(child: CodeText(code: widget.code)),
+                          const SizedBox(width: 8),
+                          LengthIndicator(
+                            radius: radius,
+                            length: length,
+                            code: widget.code,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      InnerPage(code: widget.code),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
+              )
+            : ShowDltPrompt(
+                length: length,
+                radius: radius,
+                onProceed: () {
+                  context.read<CodeGen>().clearList(widget.code);
+                  setState(() {
+                    showDltConfirm = false;
+                  });
+                  showToastMsg(context, "Code #${widget.code} deleted");
+                },
+                onCancel: () {
+                  setState(() {
+                    showDltConfirm = false;
+                  });
+                  showToastMsg(context, "Action cancelled");
+                },
               ),
-            ),
-          ),
-        ] else ...[
-          ShowDltPrompt(
-            length: widget.length,
-            radius: widget.radius,
-            onProceed: () {
-              context.read<CodeGen>().clearList(widget.code);
-              setState(() {
-                showDltConfirm = false;
-              });
-              showToastMsg(context, "Code #${widget.code} deleted");
-            },
-            onCancel: () {
-              setState(() {
-                showDltConfirm = false;
-              });
-              showToastMsg(context, "Action cancelled");
-            },
-          ),
-        ],
-      ],
+      ),
     );
   }
 }
@@ -246,25 +235,6 @@ class ContainerButton extends StatelessWidget {
   }
 }
 
-class BgContainer extends StatelessWidget {
-  const BgContainer({super.key, required this.radius});
-
-  final double radius;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Provider.of<AppColors>(context);
-    return Container(
-      height: 250,
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        color: colors.box,
-        borderRadius: BorderRadius.circular(radius),
-      ),
-    );
-  }
-}
-
 class CodeText extends StatelessWidget {
   const CodeText({super.key, required this.code});
 
@@ -272,19 +242,15 @@ class CodeText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
-    return Positioned(
-      bottom: 16,
-      left: 26,
-      child: SelectableText(
-        "#$code",
-        style: TextStyle(
-          color: colors.textClr,
-          fontSize: 26,
-          fontWeight: FontWeight.w400,
-          fontFamily: 'Product',
-        ),
-        textAlign: TextAlign.center,
+    return SelectableText(
+      "#$code",
+      style: TextStyle(
+        color: colors.textClr,
+        fontSize: 26,
+        fontWeight: FontWeight.w400,
+        fontFamily: 'Product',
       ),
+      textAlign: TextAlign.start,
     );
   }
 }
@@ -298,12 +264,11 @@ class HeadText extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
     String head = Provider.of<CodeGen>(context).getHeadForCode(code);
-    return Positioned(
-      bottom: 96,
-      left: 26,
-      right: 160,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
       child: Text(
-        head,
+        "\t\t\t$head\t\t\t",
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
@@ -334,35 +299,27 @@ class LengthIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
-    return Positioned(
-      bottom: 16,
-      right: 16,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 130,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: colors.pill,
-            borderRadius: BorderRadius.circular(radius),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.arrow_outward_rounded,
-                color: colors.iconClr,
-                size: 14,
-              ),
-              const Spacer(),
-              Text(
-                length == 1 ? "$length  Entry" : "$length Entries",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontFamily: 'Product', color: colors.textClr),
-              ),
-              const Spacer(),
-            ],
-          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 130,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: colors.pill,
+          borderRadius: BorderRadius.circular(radius),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.arrow_outward_rounded, color: colors.iconClr, size: 14),
+            const Spacer(),
+            Text(
+              length == 1 ? "$length  Entry" : "$length Entries",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontFamily: 'Product', color: colors.textClr),
+            ),
+            const Spacer(),
+          ],
         ),
       ),
     );

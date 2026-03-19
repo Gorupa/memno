@@ -460,19 +460,21 @@ class _InnerPageState extends State<InnerPage>
       ),
       child: Stack(
         children: [
-          // Title text (truncated if too long)
+          // Title text
           Positioned(
             top: 42,
-            left: 26,
-            right: 80,
-            child: Text(
-              head,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontFamily: 'Product',
-                fontWeight: FontWeight.w700,
-                fontSize: 48,
+            left: 0,
+            right: 0,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Text(
+                "\t\t$head",
+                style: const TextStyle(
+                  fontFamily: 'Product',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 48,
+                ),
               ),
             ),
           ),
