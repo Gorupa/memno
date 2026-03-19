@@ -467,13 +467,14 @@ class TopAccentBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.fromLTRB(2, 0, 2, 4),
       child: Stack(
         children: [
           //Main accent container
           Container(
-            height: colors.isCompactHeader ? 95 : 280,
+            height: colors.isCompactHeader ? width * 0.236 : width * 0.65,
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(50.0)),
               color: colors.accnt,
@@ -491,7 +492,7 @@ class TopAccentBox extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Product',
                   fontWeight: FontWeight.w700,
-                  fontSize: 48,
+                  fontSize: width * 0.11,
                 ),
               ),
             ),
@@ -500,8 +501,8 @@ class TopAccentBox extends StatelessWidget {
             Positioned(
               top: 54,
               right: 24,
-              height: 110,
-              width: 110,
+              height: width * 0.25,
+              width: width * 0.25,
               child: Image.asset('assets/memno_clear_blk.png'),
             ),
           //Code count
@@ -509,7 +510,7 @@ class TopAccentBox extends StatelessWidget {
             bottom: 16,
             right: 16,
             child: Container(
-              width: 130,
+              width: width * 0.26,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.black),
