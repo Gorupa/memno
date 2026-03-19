@@ -11,6 +11,7 @@ class AppColors extends ChangeNotifier with WidgetsBindingObserver {
 
   AppThemeMode _currentThemeMode = AppThemeMode.system;
   bool _isCompactHeader = false;
+  bool _saveImagesLocally = true;
 
   AppColors() {
     init();
@@ -39,16 +40,19 @@ class AppColors extends ChangeNotifier with WidgetsBindingObserver {
     if (togglesData == null) {
       // Default to system
       _currentThemeMode = AppThemeMode.system;
+      _saveImagesLocally = true;
       await _togglesBox.put(
         0,
         TogglesData(
           darkMode: false,
           compactHeader: _isCompactHeader,
           themeMode: 0,
+          saveImagesLocally: true,
         ),
       );
     } else {
       _isCompactHeader = togglesData.compactHeader;
+      _saveImagesLocally = togglesData.saveImagesLocally;
 
       // Migration and Load logic
       if (togglesData.themeMode != null) {
@@ -76,6 +80,7 @@ class AppColors extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   bool get isCompactHeader => _isCompactHeader;
+  bool get saveImagesLocally => _saveImagesLocally;
 
   final _light = LightColors();
   final _dark = DarkColors();
@@ -85,6 +90,16 @@ class AppColors extends ChangeNotifier with WidgetsBindingObserver {
     TogglesData? togglesData = _togglesBox.get(0);
     if (togglesData != null) {
       togglesData.themeMode = mode.index;
+      await togglesData.save();
+    }
+    notifyListeners();
+  }
+
+  Future<void> setSaveImagesLocally(bool value) async {
+    _saveImagesLocally = value;
+    TogglesData? togglesData = _togglesBox.get(0);
+    if (togglesData != null) {
+      togglesData.saveImagesLocally = value;
       await togglesData.save();
     }
     notifyListeners();

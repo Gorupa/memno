@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:any_link_preview/any_link_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -38,7 +40,8 @@ class _InnerPageState extends State<InnerPage>
       tag: 'fab_to_page',
       transitionOnUserGestures: true,
       child: Material(
-        type: MaterialType.transparency,
+        type: MaterialType.canvas,
+        color: colors.bgClr,
         child: Scaffold(
           backgroundColor: colors.bgClr,
           appBar: AppBar(
@@ -100,11 +103,11 @@ class _InnerPageState extends State<InnerPage>
                                         links[index - 1].split(' ').first,
                                       )
                                       ? Column(
-                                          crossAxisAlignment: .start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             // Show the link text
                                             Padding(
-                                              padding: .fromLTRB(22, 90, 22, 0),
+                                              padding: const EdgeInsets.fromLTRB(22, 90, 22, 0),
                                               child: LinkifyText(
                                                 links[index - 1],
                                                 onTap: (link) {
@@ -150,6 +153,7 @@ class _InnerPageState extends State<InnerPage>
                                                                 .loadPreviewSync(
                                                                   links[index -
                                                                       1],
+                                                                  saveLocally: colors.saveImagesLocally,
                                                                 )
                                                                 ?.image
                                                                 ?.height ==
@@ -157,6 +161,7 @@ class _InnerPageState extends State<InnerPage>
                                                                 .loadPreviewSync(
                                                                   links[index -
                                                                       1],
+                                                                  saveLocally: colors.saveImagesLocally,
                                                                 )
                                                                 ?.image
                                                                 ?.width
@@ -169,15 +174,27 @@ class _InnerPageState extends State<InnerPage>
                                                             // Rectangle image
                                                           ),
                                                     image: DecorationImage(
-                                                      image: NetworkImage(
-                                                        image,
-                                                      ), // Obtain the image
+                                                      image: previewMap
+                                                                  .localImagePaths[
+                                                                links[index - 1]] !=
+                                                            null
+                                                          ? FileImage(
+                                                              File(
+                                                                previewMap
+                                                                        .localImagePaths[
+                                                                    links[index -
+                                                                        1]]!,
+                                                              ),
+                                                            )
+                                                          : NetworkImage(
+                                                              image,
+                                                            ) as ImageProvider,
                                                       fit: BoxFit.cover,
                                                     ),
                                                   ),
                                                 );
                                               },
-                                              outsidePadding: const .fromLTRB(
+                                              outsidePadding: const EdgeInsets.fromLTRB(
                                                 10,
                                                 10,
                                                 10,
@@ -188,7 +205,7 @@ class _InnerPageState extends State<InnerPage>
                                               // Style of the head text
                                               titleTextStyle: TextStyle(
                                                 color: colors.textClr,
-                                                fontWeight: .bold,
+                                                fontWeight: FontWeight.bold,
                                                 fontSize: 32,
                                                 fontFamily: 'Product',
                                               ),
@@ -203,17 +220,18 @@ class _InnerPageState extends State<InnerPage>
                                               // Save the preview data locally when it is fetched
                                               onLinkPreviewDataFetched:
                                                   (data) async {
-                                                    await previewMap
-                                                        .savePreview(
-                                                          links[index - 1],
-                                                          data,
-                                                        );
+                                                    await previewMap.savePreview(
+                                                      link: links[index - 1],
+                                                      data: data,
+                                                      saveLocally: colors.saveImagesLocally,
+                                                    );
                                                   },
 
                                               // Load from the previously saved data
                                               linkPreviewData: previewMap
                                                   .loadPreviewSync(
                                                     links[index - 1],
+                                                    saveLocally: colors.saveImagesLocally,
                                                   ),
 
                                               // The link to be fetched

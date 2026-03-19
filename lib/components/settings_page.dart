@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:memno/components/show_toast.dart';
 import 'package:memno/functionality/check_update.dart';
 import 'package:memno/components/update_bottom_sheet.dart';
 import 'package:memno/functionality/import_export.dart';
+import 'package:memno/functionality/preview_map.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -67,6 +69,7 @@ class SettingsPage extends StatelessWidget {
         ),
         body: ListView(
           children: [
+            // Settings for Appearance
             settingsTitle("Settings", colors),
             settingsContainer(
               ListTile(
@@ -115,6 +118,7 @@ class SettingsPage extends StatelessWidget {
               ),
               colors,
             ),
+            // Settings for Data
             settingsTitle("Data", colors),
             settingsContainer(
               ListTile(
@@ -156,6 +160,7 @@ class SettingsPage extends StatelessWidget {
               ),
               colors,
             ),
+            // Settings for updates
             settingsTitle("Updates", colors),
             settingsContainer(
               ListTile(
@@ -220,6 +225,77 @@ class SettingsPage extends StatelessWidget {
               ),
               colors,
             ),
+            // Storage settings
+            settingsTitle("Storage", colors),
+            // Settings for saving previews locally
+            settingsContainer(
+              SwitchListTile(
+                trackColor: WidgetStateProperty.all(
+                  colors.accnt.withValues(alpha: 0.3),
+                ),
+                overlayColor: WidgetStateProperty.all(colors.accnt),
+                thumbColor: WidgetStateProperty.all(colors.thumbClr),
+                trackOutlineColor: WidgetStateProperty.all(
+                  colors.switchTrackOutlineClr,
+                ),
+                title: Text(
+                  "Save Previews Locally",
+                  style: TextStyle(
+                    fontFamily: 'Product',
+                    fontSize: 18,
+                    color: colors.textClr,
+                  ),
+                ),
+                value: context.watch<AppColors>().saveImagesLocally,
+                onChanged: (val) async {
+                  await colors.setSaveImagesLocally(val);
+                },
+              ),
+              colors,
+            ),
+            // Settings for showing the storage used and to clear the cache
+            Consumer<PreviewMap>(
+              builder: (context, previewMap, _) {
+                return FutureBuilder<double>(
+                  future: previewMap.getTotalCacheSizeMB(),
+                  builder: (context, snapshot) {
+                    final size = snapshot.data ?? 0.0;
+                    return settingsContainer(
+                      ListTile(
+                        onTap: () async {
+                          await previewMap.clearImageCache();
+                          if (context.mounted) {
+                            showToastMsg(context, "Preview cache cleared");
+                          }
+                        },
+                        title: Text(
+                          "Clear Preview Cache",
+                          style: TextStyle(
+                            fontFamily: 'Product',
+                            fontSize: 18,
+                            color: colors.textClr,
+                          ),
+                        ),
+                        subtitle: Text(
+                          "Used: ${size.toStringAsFixed(2)} MB",
+                          style: TextStyle(
+                            fontFamily: 'Product',
+                            fontSize: 14,
+                            color: colors.textClr.withValues(alpha: 0.7),
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.delete_sweep_rounded,
+                          color: colors.textClr,
+                        ),
+                      ),
+                      colors,
+                    );
+                  },
+                );
+              },
+            ),
+            // About section
             settingsTitle("About", colors),
             settingsContainer(
               ListTile(

@@ -57,6 +57,8 @@ class MyApp extends StatelessWidget {
       home: const HomePage(),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: colors.accnt),
+        scaffoldBackgroundColor: colors.bgClr,
+        canvasColor: colors.bgClr,
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             overlayColor: WidgetStateProperty.all(

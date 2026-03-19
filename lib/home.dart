@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
   void _checkForUpdates() async {
     // Clean up any old APKs first
     await cleanupUpdateFiles();
-    
+
     final updateInfo = await checkUpdateAvailable();
     if (updateInfo != null && mounted) {
       showModalBottomSheet(
