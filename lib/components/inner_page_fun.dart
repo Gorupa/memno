@@ -34,7 +34,11 @@ class InnerPageButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: colors.btnIcon, size: 20),
+          Icon(
+            icon,
+            color: icon == Icons.favorite_rounded ? Colors.red : colors.btnIcon,
+            size: 20,
+          ),
           if (label != null) ...[
             const SizedBox(width: 8),
             Text(

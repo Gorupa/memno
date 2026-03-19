@@ -5,6 +5,8 @@ import 'package:memno/functionality/code_gen.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
+import 'package:memno/components/inner_page_fun.dart';
+
 class SubTile extends StatelessWidget {
   final int code;
   final String date;
@@ -83,18 +85,61 @@ class _SubTileStackState extends State<SubTileStack> {
               );
             },
           ),
-          //Date Time Indicator
-          DateTimeIndicator(date: widget.date),
-          //Like Button
-          LikeButton(code: widget.code, isLiked: widget.isLiked),
-          //Delete Button
-          DltButton(
-            code: widget.code,
-            onPressed: () {
-              setState(() {
-                showDltConfirm = true;
-              });
-            },
+          // Action Bar (Date, Like, Delete)
+          Positioned(
+            top: 12,
+            left: 14,
+            right: 14,
+            child: SizedBox(
+              height: 65,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  spacing: 8,
+                  children: [
+                    // Date Display (Unified Style)
+                    InnerPageButton(
+                      icon: Icons.calendar_month_outlined,
+                      label: getFormattedDate(DateTime.parse(widget.date)),
+                      onPressed: () {},
+                    ),
+                    // Like Button
+                    InnerPageButton(
+                      key: ValueKey(widget.code),
+                      icon: widget.isLiked
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
+                      label: widget.isLiked ? "Liked" : "Like",
+                      onPressed: () {
+                        context.read<CodeGen>().toggleLike(widget.code);
+                        if (widget.isLiked) {
+                          showToastMsg(
+                            context,
+                            "#${widget.code} removed from favorites",
+                          );
+                        } else {
+                          showToastMsg(
+                            context,
+                            "#${widget.code} added to favorites",
+                          );
+                        }
+                      },
+                    ),
+                    // Delete Button
+                    InnerPageButton(
+                      icon: Icons.delete_outline_rounded,
+                      label: "Delete",
+                      onPressed: () {
+                        setState(() {
+                          showDltConfirm = true;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ] else ...[
           ShowDltPrompt(
@@ -210,7 +255,7 @@ class BgContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
     return Container(
-      height: 240,
+      height: 250,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         color: colors.box,
@@ -319,93 +364,6 @@ class LengthIndicator extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class DateTimeIndicator extends StatelessWidget {
-  const DateTimeIndicator({super.key, required this.date});
-
-  final String date;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Provider.of<AppColors>(context);
-    return Positioned(
-      top: 28,
-      left: 26,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(Icons.calendar_month_outlined, color: colors.iconClr, size: 22),
-          const SizedBox(width: 8),
-          Text(
-            getFormattedDate(DateTime.parse(date)),
-            textAlign: TextAlign.center,
-            style: TextStyle(color: colors.textClr, fontFamily: 'Product'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class LikeButton extends StatelessWidget {
-  const LikeButton({super.key, required this.code, required this.isLiked});
-
-  final int code;
-  final bool isLiked;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Provider.of<AppColors>(context);
-    return Positioned(
-      right: 84,
-      top: 16,
-      child: ElevatedButton(
-        key: ValueKey(code),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colors.btnClr,
-          shape: const CircleBorder(),
-          padding: const EdgeInsets.all(16),
-        ),
-        onPressed: () {
-          context.read<CodeGen>().toggleLike(code);
-          if (isLiked) {
-            showToastMsg(context, "#$code removed from favorites");
-          } else {
-            showToastMsg(context, "#$code added to favorites");
-          }
-        },
-        child: isLiked == true
-            ? const Icon(Icons.favorite_rounded, color: Colors.red)
-            : Icon(Icons.favorite_border_rounded, color: colors.btnIcon),
-      ),
-    );
-  }
-}
-
-class DltButton extends StatelessWidget {
-  const DltButton({super.key, required this.code, required this.onPressed});
-
-  final int code;
-  final VoidCallback onPressed;
-  @override
-  Widget build(BuildContext context) {
-    final colors = Provider.of<AppColors>(context);
-    return Positioned(
-      right: 14,
-      top: 16,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colors.btnClr,
-          shape: const CircleBorder(),
-          padding: const EdgeInsets.all(16),
-        ),
-        onPressed: onPressed,
-        child: Icon(Icons.close_rounded, color: colors.btnIcon),
       ),
     );
   }
