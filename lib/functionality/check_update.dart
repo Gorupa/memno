@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:ota_update/ota_update.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<Map<String, dynamic>?> getLatestGitHubRelease() async {
   try {
@@ -96,4 +99,70 @@ bool isNewerVersion(String latest, String current, String buildNumber) {
     }
   }
   return false;
+}
+
+/// Triggers an OTA update using the provided [url].
+/// Returns a Stream of OtaEvent containing the download progress and status.
+Stream<OtaEvent> startOtaUpdate(String url) {
+  try {
+    return OtaUpdate().execute(
+      url,
+      // Optional: you can provide checksum if needed
+      // destinationName: 'memno.apk',
+    );
+  } catch (e) {
+    rethrow;
+  }
+}
+
+/// High-level check for updates.
+/// Returns a Map if an update is available, null otherwise.
+Future<Map<String, dynamic>?> checkUpdateAvailable() async {
+  try {
+    final info = await PackageInfo.fromPlatform();
+    final currVer = info.version;
+    final buildNumber = info.buildNumber;
+
+    if (currVer.isEmpty || buildNumber.isEmpty) return null;
+
+    final release = await getLatestGitHubRelease();
+    if (release == null) return null;
+
+    final latestVerWithTag = release['tag_name'].toString();
+    // Some tags start with 'v', remove it if needed
+    final latestVer = latestVerWithTag.startsWith('v')
+        ? latestVerWithTag.substring(1).split('+')[0]
+        : latestVerWithTag.split('+')[0];
+
+    if (isNewerVersion(latestVer, currVer, buildNumber)) {
+      return {
+        'version': latestVer,
+        'url': getDownloadUrlForDevice(release),
+        'notes': release['body'] ?? "No release notes available.",
+      };
+    }
+  } catch (e) {
+    // Silent fail
+  }
+  return null;
+}
+
+/// Deletes any lingering .apk files in the app's download directory to save space.
+Future<void> cleanupUpdateFiles() async {
+  try {
+    if (Platform.isAndroid) {
+      // ota_update stores files in getExternalFilesDir(null)
+      final directory = await getExternalStorageDirectory();
+      if (directory != null && await directory.exists()) {
+        final List<FileSystemEntity> files = directory.listSync();
+        for (final file in files) {
+          if (file is File && file.path.toLowerCase().endsWith('.apk')) {
+            await file.delete();
+          }
+        }
+      }
+    }
+  } catch (e) {
+    // Silent fail
+  }
 }

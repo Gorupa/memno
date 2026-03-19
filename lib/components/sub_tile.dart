@@ -71,6 +71,9 @@ class _SubTileStackState extends State<SubTileStack> {
                               icon: widget.isLiked
                                   ? Icons.favorite_rounded
                                   : Icons.favorite_border_rounded,
+                              iconColor: widget.isLiked
+                                  ? Colors.red
+                                  : colors.textClr,
                               label: widget.isLiked ? "Liked" : "Like",
                               onPressed: () {
                                 context.read<CodeGen>().toggleLike(widget.code);
@@ -310,6 +313,7 @@ class LengthIndicator extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 8,
           children: [
             Icon(Icons.arrow_outward_rounded, color: colors.iconClr, size: 14),
             const Spacer(),

@@ -9,20 +9,24 @@ class InnerPageButton extends StatelessWidget {
     required this.onPressed,
     this.label,
     this.backgroundColor,
+    this.foregroundColor,
+    this.iconColor,
   });
 
   final IconData icon;
   final VoidCallback onPressed;
   final String? label;
   final Color? backgroundColor;
+  final Color? foregroundColor;
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor ?? colors.btnClr,
-        foregroundColor: colors.btnIcon,
+        backgroundColor: backgroundColor ?? colors.pill,
+        foregroundColor: foregroundColor ?? colors.textClr,
         shape: const StadiumBorder(),
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         elevation: 0,
@@ -31,11 +35,7 @@ class InnerPageButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: icon == Icons.favorite_rounded ? Colors.red : colors.btnIcon,
-            size: 20,
-          ),
+          Icon(icon, color: iconColor ?? colors.textClr, size: 16),
           if (label != null) ...[
             const SizedBox(width: 8),
             Text(
@@ -43,7 +43,7 @@ class InnerPageButton extends StatelessWidget {
               style: const TextStyle(
                 fontFamily: 'Product',
                 fontSize: 14,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.normal,
               ),
             ),
           ],

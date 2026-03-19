@@ -261,6 +261,8 @@ class _InnerPageState extends State<InnerPage>
                                           label: index.toString(),
                                           onPressed: () {},
                                           backgroundColor: Colors.black,
+                                          foregroundColor: Colors.white,
+                                          iconColor: Colors.white,
                                         ),
 
                                         // Edit Button
