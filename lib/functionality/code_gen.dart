@@ -110,6 +110,7 @@ class CodeGen extends ChangeNotifier {
         .firstOrNull;
     if (codeData == null) return;
     codeData.head = head;
+    codeData.date = DateTime.now().toString();
     await codeData.save();
     notifyListeners();
   }
@@ -131,6 +132,7 @@ class CodeGen extends ChangeNotifier {
         .firstOrNull;
     if (codeData == null) return;
     codeData.links.add(link);
+    codeData.date = DateTime.now().toString();
     await codeData.save();
     notifyListeners();
   }
@@ -143,6 +145,7 @@ class CodeGen extends ChangeNotifier {
     if (codeData == null) return;
     if (codeData.links.length > index) {
       codeData.links[index] = newLink;
+      codeData.date = DateTime.now().toString();
       await codeData.save();
       notifyListeners();
     }
@@ -156,6 +159,7 @@ class CodeGen extends ChangeNotifier {
     if (codeData == null) return;
     if (codeData.links.length > index) {
       codeData.links.removeAt(index);
+      codeData.date = DateTime.now().toString();
       await codeData.save();
       notifyListeners();
     }

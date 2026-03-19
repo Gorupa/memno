@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memno/functionality/check_update.dart';
+import 'package:memno/components/update_bottom_sheet.dart';
 import 'package:memno/functionality/import_export.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -68,27 +69,24 @@ class SettingsPage extends StatelessWidget {
           children: [
             settingsTitle("Settings", colors),
             settingsContainer(
-              SwitchListTile(
-                trackColor: WidgetStateProperty.all(
-                  colors.accnt.withValues(alpha: 0.3),
-                ),
-                overlayColor: WidgetStateProperty.all(colors.accnt),
-                thumbColor: WidgetStateProperty.all(colors.thumbClr),
-                trackOutlineColor: WidgetStateProperty.all(
-                  colors.switchTrackOutlineClr,
-                ),
+              ListTile(
+                onTap: () => colors.cycleThemeMode(),
                 title: Text(
-                  "Dark Mode",
+                  "Appearance",
                   style: TextStyle(
                     fontFamily: 'Product',
                     fontSize: 18,
                     color: colors.textClr,
                   ),
                 ),
-                value: context.watch<AppColors>().isDarkMode,
-                onChanged: (_) async {
-                  await colors.toggleTheme();
-                },
+                trailing: Icon(
+                  colors.themeMode == AppThemeMode.system
+                      ? Icons.brightness_auto_rounded
+                      : colors.themeMode == AppThemeMode.light
+                      ? Icons.light_mode_rounded
+                      : Icons.dark_mode_rounded,
+                  color: colors.textClr,
+                ),
               ),
               colors,
             ),
@@ -178,59 +176,28 @@ class SettingsPage extends StatelessWidget {
                     );
                     return;
                   }
-                  // Get latest release data from GitHub
-                  final release = await getLatestGitHubRelease();
+                  // Use the new update check service
+                  final updateInfo = await checkUpdateAvailable();
                   if (!context.mounted) return;
-                  if (release == null) {
-                    _showDialog(
-                      context,
-                      "Update Check Failed",
-                      "Could not check for updates.",
-                      colors,
-                      () {
-                        Navigator.pop(context);
-                      },
-                    );
-                    return;
-                  }
 
-                  final latestVer = release['tag_name'].toString().split(
-                    '+',
-                  )[0]; // Obtain latest version on GitHub
-                  final browserUrl = getDownloadUrlForDevice(
-                    release,
-                  ); // Obtain arch-appropriate download link
-                  if (browserUrl == null ||
-                      browserUrl.isEmpty ||
-                      latestVer.isEmpty) {
-                    _showDialog(
-                      context,
-                      "Update Check Failed",
-                      "Could not find download link for the latest version.",
-                      colors,
-                      () {
-                        Navigator.pop(context);
-                      },
-                    );
-                    return;
-                  }
-                  // Compare versions
-                  if (isNewerVersion(latestVer, currVer, buildNumber)) {
-                    _showDialog(
-                      context,
-                      "Update Available",
-                      "A new version ($latestVer) is available. Please update to enjoy the latest features.",
-                      colors,
-                      () {
-                        Navigator.pop(context);
-                        launchUrl(Uri.parse(browserUrl));
-                      },
+                  if (updateInfo != null) {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => UpdateBottomSheet(
+                        latestVersion: updateInfo['version'],
+                        downloadUrl: updateInfo['url'],
+                        releaseNotes: updateInfo['notes'],
+                      ),
                     );
                   } else {
+                    final info = await PackageInfo.fromPlatform();
+                    if (!context.mounted) return;
                     _showDialog(
                       context,
                       "No Updates",
-                      "You are using the latest version ($currVer).",
+                      "You are using the latest version (${info.version}).",
                       colors,
                       () {
                         Navigator.pop(context);
@@ -299,7 +266,7 @@ class SettingsPage extends StatelessWidget {
   Container settingsContainer(Widget child, AppColors colors) {
     return Container(
       height: 100,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       margin: const EdgeInsets.fromLTRB(2, 4, 2, 4),
       alignment: Alignment.center,
       decoration: BoxDecoration(

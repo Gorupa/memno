@@ -12,6 +12,8 @@ import 'package:memno/main.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:memno/functionality/check_update.dart';
+import 'package:memno/components/update_bottom_sheet.dart';
 
 enum Filters { all, liked, empty }
 
@@ -35,6 +37,26 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     clearState();
     _initShareIntent();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkForUpdates());
+  }
+
+  void _checkForUpdates() async {
+    // Clean up any old APKs first
+    await cleanupUpdateFiles();
+    
+    final updateInfo = await checkUpdateAvailable();
+    if (updateInfo != null && mounted) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => UpdateBottomSheet(
+          latestVersion: updateInfo['version'],
+          downloadUrl: updateInfo['url'],
+          releaseNotes: updateInfo['notes'],
+        ),
+      );
+    }
   }
 
   void _initShareIntent() {
@@ -235,7 +257,11 @@ class _HomePageState extends State<HomePage> {
                       final code = filteredList[index - 1];
                       final date = codeProvider.getDateForCode(code);
                       final isLiked = codeProvider.getLikeForCode(code);
-                      return SubTile(code: code, date: date, isLiked: isLiked);
+                      return SubTileStack(
+                        code: code,
+                        date: date,
+                        isLiked: isLiked,
+                      );
                     }
                   },
                 );
@@ -467,13 +493,14 @@ class TopAccentBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.fromLTRB(2, 0, 2, 4),
       child: Stack(
         children: [
           //Main accent container
           Container(
-            height: colors.isCompactHeader ? 95 : 280,
+            height: colors.isCompactHeader ? width * 0.236 : width * 0.65,
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(50.0)),
               color: colors.accnt,
@@ -491,7 +518,7 @@ class TopAccentBox extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Product',
                   fontWeight: FontWeight.w700,
-                  fontSize: 48,
+                  fontSize: width * 0.11,
                 ),
               ),
             ),
@@ -500,8 +527,8 @@ class TopAccentBox extends StatelessWidget {
             Positioned(
               top: 54,
               right: 24,
-              height: 110,
-              width: 110,
+              height: width * 0.25,
+              width: width * 0.25,
               child: Image.asset('assets/memno_clear_blk.png'),
             ),
           //Code count
@@ -509,7 +536,7 @@ class TopAccentBox extends StatelessWidget {
             bottom: 16,
             right: 16,
             child: Container(
-              width: 130,
+              width: width * 0.26,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.black),
