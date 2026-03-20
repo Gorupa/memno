@@ -105,7 +105,10 @@ bool isNewerVersion(String latest, String current, String buildNumber) {
 /// Returns a Stream of OtaEvent containing the download progress and status.
 Stream<OtaEvent> startOtaUpdate(String url) {
   try {
-    return OtaUpdate().execute(url);
+    return OtaUpdate().execute(
+      url,
+      androidProviderAuthority: 'com.jdmakes.memno.ota_update_provider',
+    );
   } catch (e) {
     rethrow;
   }
