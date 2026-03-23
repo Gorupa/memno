@@ -275,14 +275,21 @@ class _HomePageState extends State<HomePage> {
                 );
         },
       ),
-      floatingActionButton: isSearchBarVisible
-          ? subTileSearch(context)
-          : CustomFAB(
-              onSearch: () {
-                switchSearchMode();
-                clearState();
-              },
-            ),
+      floatingActionButton: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return ScaleTransition(scale: animation, child: child);
+        },
+        child: isSearchBarVisible
+            ? subTileSearch(context)
+            : CustomFAB(
+                key: const ValueKey('fabToggle'),
+                onSearch: () {
+                  switchSearchMode();
+                  clearState();
+                },
+              ),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
@@ -335,6 +342,7 @@ class _HomePageState extends State<HomePage> {
   Widget subTileSearch(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
     return Padding(
+      key: const ValueKey('searchBar'),
       padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -493,64 +501,70 @@ class TopAccentBox extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.fromLTRB(2, 0, 2, 4),
-      child: Stack(
-        children: [
-          //Main accent container
-          Container(
-            height: colors.isCompactHeader ? width * 0.236 : width * 0.65,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(50.0)),
-              color: colors.accnt,
-            ),
-          ),
-          //Custom toggle button
-          Positioned(bottom: 16, left: 16, child: customToggle),
-          //Intro text
-          if (!colors.isCompactHeader)
-            Positioned(
-              top: 38,
-              left: 26,
-              child: Text(
-                "Hi,\nI'm Memno",
-                style: TextStyle(
-                  fontFamily: 'Product',
-                  fontWeight: FontWeight.w700,
-                  fontSize: width * 0.11,
+      child: Container(
+        height: colors.isCompactHeader ? width * 0.236 : width * 0.65,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(50.0)),
+          color: colors.accnt,
+        ),
+        child: Column(
+          children: [
+            if (!colors.isCompactHeader)
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10, top: 22),
+                      child: Text(
+                        "Hi,\nI'm Memno",
+                        style: TextStyle(
+                          fontFamily: 'Product',
+                          fontWeight: FontWeight.w700,
+                          fontSize: width * 0.11,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8, top: 38),
+                      child: Image.asset(
+                        'assets/memno_clear_blk.png',
+                        height: width * 0.25,
+                        width: width * 0.25,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-          //Memno image
-          if (!colors.isCompactHeader)
-            Positioned(
-              top: 54,
-              right: 24,
-              height: width * 0.25,
-              width: width * 0.25,
-              child: Image.asset('assets/memno_clear_blk.png'),
-            ),
-          //Code count
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: Container(
-              width: width * 0.26,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                color: colors.accntPill,
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: Text(
-                length == 1 ? '$length Code' : '$length Codes',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Product',
-                  color: colors.accntText,
+              )
+            else
+              const Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                customToggle,
+                Container(
+                  width: width * 0.26,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                    color: colors.accntPill,
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: Text(
+                    length == 1 ? '$length Code' : '$length Codes',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Product',
+                      color: colors.accntText,
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
