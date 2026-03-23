@@ -373,6 +373,9 @@ class _InnerPageState extends State<InnerPage>
                                                             dialogContext,
                                                           );
                                                           context
+                                                              .read<PreviewMap>()
+                                                              .deletePreviewForLink(links[index - 1]);
+                                                          context
                                                               .read<CodeGen>()
                                                               .deleteLink(
                                                                 widget.code,

@@ -20,7 +20,7 @@ class TogglesDataAdapter extends TypeAdapter<TogglesData> {
       darkMode: fields[0] as bool,
       compactHeader: fields[1] as bool,
       themeMode: fields[2] as int?,
-      saveImagesLocally: fields[3] as bool,
+      saveImagesLocally: fields[3] == null ? true : fields[3] as bool,
     );
   }
 

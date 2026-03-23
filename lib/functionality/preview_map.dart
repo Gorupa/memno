@@ -176,6 +176,29 @@ class PreviewMap extends ChangeNotifier {
     }
   }
 
+  Future<void> deletePreviewForLink(String link) async {
+    try {
+      if (!_isInit) await _init();
+      final key = _hiveKey(link);
+      
+      if (_previewBox != null && _previewBox!.isOpen) {
+        final model = _previewBox!.get(key);
+        if (model != null && model.localImagePath != null) {
+          final file = File(model.localImagePath!);
+          if (await file.exists()) {
+            await file.delete();
+          }
+        }
+        await _previewBox!.delete(key);
+      }
+      cache.remove(link);
+      localImagePaths.remove(link);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('deletePreviewForLink error: $e');
+    }
+  }
+
   Future<void> clearImageCache() async {
     try {
       if (_previewsDirPath == null) await _init();
