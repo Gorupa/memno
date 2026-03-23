@@ -20,8 +20,15 @@ class ShareTargetPage extends StatefulWidget {
 
 class _ShareTargetPageState extends State<ShareTargetPage> {
   final TextEditingController _searchController = TextEditingController();
+  late final TextEditingController _sharedTextController;
   String _searchQuery = '';
   Timer? _debounceTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _sharedTextController = TextEditingController(text: widget.sharedText);
+  }
 
   void _onSearch(String query) {
     if (_debounceTimer?.isActive ?? false) {
@@ -57,16 +64,20 @@ class _ShareTargetPageState extends State<ShareTargetPage> {
   }
 
   void _saveToCode(int code) {
-    context.read<CodeGen>().addLink(code, widget.sharedText);
+    if (_sharedTextController.text.isEmpty) return;
+    context.read<CodeGen>().addLink(code, _sharedTextController.text);
     showToastMsg(context, "Saved to #$code");
-    Navigator.of(context).pop();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => InnerPage(code: code)),
+    );
   }
 
   void _createNewAndSave() {
+    if (_sharedTextController.text.isEmpty) return;
     final codeProvider = context.read<CodeGen>();
     codeProvider.generateCode();
     final newCode = codeProvider.codeList.last;
-    codeProvider.addLink(newCode, widget.sharedText);
+    codeProvider.addLink(newCode, _sharedTextController.text);
     showToastMsg(context, "Saved to new code #$newCode");
 
     // Replace this page with InnerPage for the new code
@@ -79,6 +90,7 @@ class _ShareTargetPageState extends State<ShareTargetPage> {
   void dispose() {
     _debounceTimer?.cancel();
     _searchController.dispose();
+    _sharedTextController.dispose();
     super.dispose();
   }
 
@@ -108,7 +120,7 @@ class _ShareTargetPageState extends State<ShareTargetPage> {
           return Column(
             children: [
               // Shared content preview card
-              _SharedContentCard(sharedText: widget.sharedText, colors: colors),
+              _SharedContentCard(controller: _sharedTextController, colors: colors),
 
               const SizedBox(height: 8),
 
@@ -197,10 +209,10 @@ class _ShareTargetPageState extends State<ShareTargetPage> {
 
 /// Card showing the shared content at the top of the page.
 class _SharedContentCard extends StatelessWidget {
-  final String sharedText;
+  final TextEditingController controller;
   final AppColors colors;
 
-  const _SharedContentCard({required this.sharedText, required this.colors});
+  const _SharedContentCard({required this.controller, required this.colors});
 
   @override
   Widget build(BuildContext context) {
@@ -225,15 +237,20 @@ class _SharedContentCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            sharedText,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
+          TextField(
+            controller: controller,
+            maxLines: 4,
+            minLines: 1,
             style: const TextStyle(
               fontFamily: 'Product',
               fontWeight: FontWeight.w500,
               fontSize: 16,
               color: Colors.black,
+            ),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
             ),
           ),
         ],
@@ -302,7 +319,7 @@ class _CodePageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
       child: Container(
         height: 100,

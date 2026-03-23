@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:memno/components/inner_page.dart';
 import 'package:memno/components/show_toast.dart';
 import 'package:memno/functionality/code_gen.dart';
+import 'package:memno/functionality/preview_map.dart';
 import 'package:memno/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
@@ -145,7 +146,15 @@ class _SubTileStackState extends State<SubTileStack> {
                 length: length,
                 radius: radius,
                 onProceed: () {
-                  context.read<CodeGen>().clearList(widget.code);
+                  final codeProvider = context.read<CodeGen>();
+                  final previewMap = context.read<PreviewMap>();
+                  final linksToDelete = codeProvider.getLinksForCode(
+                    widget.code,
+                  );
+                  for (final link in linksToDelete) {
+                    previewMap.deletePreviewForLink(link);
+                  }
+                  codeProvider.clearList(widget.code);
                   setState(() {
                     showDltConfirm = false;
                   });
@@ -225,7 +234,7 @@ class ContainerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
       child: Container(
         width: 120,
@@ -308,10 +317,10 @@ class LengthIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Provider.of<AppColors>(context);
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
       child: Container(
-        width: 130,
+        width: 150,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: colors.pill,
@@ -319,7 +328,6 @@ class LengthIndicator extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 8,
           children: [
             Icon(Icons.arrow_outward_rounded, color: colors.iconClr, size: 14),
             const Spacer(),
