@@ -46,4 +46,5 @@ app.*.map.json
 *.jks
 *.keystore
 *.base64
+DESKTOP.md
 android/key.properties
