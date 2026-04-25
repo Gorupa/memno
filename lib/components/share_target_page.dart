@@ -63,21 +63,26 @@ class _ShareTargetPageState extends State<ShareTargetPage> {
     return codes;
   }
 
-  void _saveToCode(int code) {
+  Future<void> _saveToCode(int code) async {
     if (_sharedTextController.text.isEmpty) return;
-    context.read<CodeGen>().addLink(code, _sharedTextController.text);
+    await context.read<CodeGen>().addLink(code, _sharedTextController.text);
+    if (!mounted) return;
     showToastMsg(context, "Saved to #$code");
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => InnerPage(code: code)),
     );
   }
 
-  void _createNewAndSave() {
+  Future<void> _createNewAndSave() async {
     if (_sharedTextController.text.isEmpty) return;
     final codeProvider = context.read<CodeGen>();
-    codeProvider.generateCode();
+    // BUG FIX: generateCode() is async — must be awaited before reading
+    // codeList.last, otherwise the new code hasn't been written to Hive yet
+    // and addLink() silently does nothing (code not found).
+    await codeProvider.generateCode();
     final newCode = codeProvider.codeList.last;
-    codeProvider.addLink(newCode, _sharedTextController.text);
+    await codeProvider.addLink(newCode, _sharedTextController.text);
+    if (!mounted) return;
     showToastMsg(context, "Saved to new code #$newCode");
 
     // Replace this page with InnerPage for the new code
