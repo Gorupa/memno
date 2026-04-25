@@ -82,6 +82,9 @@ class _HomePageState extends State<HomePage> {
         if (sharedText.isNotEmpty) {
           _navigateToShareTarget(sharedText);
         }
+        // BUG FIX: reset the intent so it does not replay on the next
+        // normal app launch (without a share).
+        ReceiveSharingIntent.instance.reset();
       }
     });
   }
@@ -261,7 +264,6 @@ class _HomePageState extends State<HomePage> {
                         customToggle: _customToggleButtons(context),
                       );
                     } else {
-                      //final reversedIndex = filteredList.length - index;
                       final code = filteredList[index - 1];
                       final date = codeProvider.getDateForCode(code);
                       final isLiked = codeProvider.getLikeForCode(code);
@@ -543,9 +545,7 @@ class TopAccentBox extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Toggle for All, Liked or Empty
               customToggle,
-              // Total number of counts
               Container(
                 width: width * 0.26,
                 padding: const EdgeInsets.all(20),
