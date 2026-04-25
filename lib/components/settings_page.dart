@@ -67,7 +67,6 @@ class SettingsPage extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          // Settings for Appearance
           settingsTitle("Settings", colors),
           settingsContainer(
             ListTile(
@@ -116,7 +115,6 @@ class SettingsPage extends StatelessWidget {
             ),
             colors,
           ),
-          // Settings for Data
           settingsTitle("Data", colors),
           settingsContainer(
             ListTile(
@@ -155,14 +153,13 @@ class SettingsPage extends StatelessWidget {
             ),
             colors,
           ),
-          // Settings for updates
           settingsTitle("Updates", colors),
           settingsContainer(
             ListTile(
               onTap: () async {
                 final info = await PackageInfo.fromPlatform();
-                final currVer = info.version; // Get current app version
-                final buildNumber = info.buildNumber; // Get build number
+                final currVer = info.version;
+                final buildNumber = info.buildNumber;
                 if (!context.mounted) return;
                 if (currVer.isEmpty || buildNumber.isEmpty) {
                   _showDialog(
@@ -170,13 +167,10 @@ class SettingsPage extends StatelessWidget {
                     "Version Check Failed",
                     "Could not retrieve current version.",
                     colors,
-                    () {
-                      Navigator.pop(context);
-                    },
+                    () => Navigator.pop(context),
                   );
                   return;
                 }
-                // Use the new update check service
                 final updateInfo = await checkUpdateAvailable();
                 if (!context.mounted) return;
 
@@ -199,9 +193,7 @@ class SettingsPage extends StatelessWidget {
                     "No Updates",
                     "You are using the latest version (${info.version}).",
                     colors,
-                    () {
-                      Navigator.pop(context);
-                    },
+                    () => Navigator.pop(context),
                   );
                 }
               },
@@ -220,9 +212,7 @@ class SettingsPage extends StatelessWidget {
             ),
             colors,
           ),
-          // Storage settings
           settingsTitle("Storage", colors),
-          // Settings for saving previews locally
           settingsContainer(
             SwitchListTile(
               trackColor: WidgetStateProperty.all(
@@ -248,7 +238,6 @@ class SettingsPage extends StatelessWidget {
             ),
             colors,
           ),
-          // Settings for showing the storage used and to clear the cache
           Consumer<PreviewMap>(
             builder: (context, previewMap, _) {
               return FutureBuilder<double>(
@@ -290,7 +279,6 @@ class SettingsPage extends StatelessWidget {
               );
             },
           ),
-          // About section
           settingsTitle("About", colors),
           settingsContainer(
             ListTile(
@@ -312,7 +300,37 @@ class SettingsPage extends StatelessWidget {
             ),
             colors,
           ),
-          // Bottom padding
+          // Contributors section
+          settingsTitle("Contributors", colors),
+          settingsContainer(
+            ListTile(
+              leading: CircleAvatar(
+                backgroundColor: colors.accnt,
+                child: Icon(Icons.person_rounded, color: Colors.black),
+              ),
+              title: Text(
+                "Mine Gorupa",
+                style: TextStyle(
+                  fontFamily: 'Product',
+                  fontSize: 18,
+                  color: colors.textClr,
+                ),
+              ),
+              subtitle: Text(
+                "Fork contributor — Share bug fix",
+                style: TextStyle(
+                  fontFamily: 'Product',
+                  fontSize: 13,
+                  color: colors.textClr.withValues(alpha: 0.6),
+                ),
+              ),
+              trailing: Icon(
+                Icons.code_rounded,
+                color: colors.textClr,
+              ),
+            ),
+            colors,
+          ),
           const SizedBox(height: 100),
         ],
       ),
